@@ -73,4 +73,4 @@ What makes it different:
 ## 🌐 Deployed Project
 
 - **Live Demo:** https://your-deployed-link.com
-- **GitHub:** https://github.com/your-org/pinpoint
+- **GitHub:** https://github.com/keannobrennel/pinpoint
