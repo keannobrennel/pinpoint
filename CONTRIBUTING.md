@@ -18,18 +18,48 @@
    git checkout -b feat/your-feature-name
    ```
 
-2. **Commit with clear messages**
-   ```
-   feat: add Gemini Vision validation pipeline
-   fix: correct heatmap density weight calculation
-   chore: update .env.example with Maps API key
-   ```
+2. **Commit with clear messages** (see convention below)
 
 3. **Open a PR from your feature branch → `dev`**
    - Describe what changed and why
    - Tag a teammate for review before merging
 
 4. **`dev` → `main` merges** are done by the team lead only, after confirming the build is stable
+
+---
+
+## Commit Message Convention
+
+Format:
+```
+type: short description in lowercase
+```
+
+| Type | When to use |
+|------|-------------|
+| `feat:` | Adding a new feature |
+| `fix:` | Fixing a bug |
+| `chore:` | Setup, config, non-code changes |
+| `style:` | UI/CSS changes only |
+| `refactor:` | Restructuring code without changing behavior |
+| `docs:` | README, comments, documentation |
+
+**Examples:**
+```
+feat: add Gemini Vision validation pipeline
+feat: implement heatmap density layer
+fix: correct triage ranking weight calculation
+chore: add README and env example
+style: update dashboard card layout
+docs: add setup instructions to CONTRIBUTING
+```
+
+**Rules:**
+- Always lowercase after the colon
+- Keep it short and specific — one line
+- Use present tense ("add" not "added")
+
+---
 
 ## Environment Setup
 
