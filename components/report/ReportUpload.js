@@ -70,7 +70,7 @@ export default function ReportUpload() {
       const base64Data = base64.split(",")[1];
       const mimeType = image.type;
       const token = await auth.currentUser.getIdToken();
-      const res = await fetch("/api/report-list", {
+      const res = await fetch("/api/reports", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
