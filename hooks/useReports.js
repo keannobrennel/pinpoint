@@ -20,10 +20,7 @@ export function useReports(role) {
   // reports listener
   useEffect(() => {
     const user = auth.currentUser;
-    if (!isStaff && !user) {
-      setReports([]);
-      return;
-    }
+    if (!isStaff && !user) return;
 
     const reportsRef = collection(db, "reports");
     const q = isStaff
@@ -35,8 +32,7 @@ export function useReports(role) {
     });
 
     return () => unsubscribe();
-  }, [isStaff, auth.currentUser]);
-
+  }, [isStaff]);
   // zones — fetched via API (public for counts/verdict, full detail for staff)
   useEffect(() => {
     let cancelled = false;

@@ -7,7 +7,21 @@ import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
 } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
+
+async function ensureUserDoc(user) {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      email: user.email,
+      displayName: user.displayName ?? "",
+      role: "public",
+      createdAt: new Date().toISOString(),
+    });
+  }
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,7 +34,8 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      await signInWithPopup(auth, new GoogleAuthProvider());
+      const { user } = await signInWithPopup(auth, new GoogleAuthProvider());
+      await ensureUserDoc(user);
       router.push("/");
     } catch (err) {
       setError(err.message);
@@ -34,7 +49,8 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const { user } = await signInWithEmailAndPassword(auth, email, password);
+      await ensureUserDoc(user);
       router.push("/");
     } catch (err) {
       setError(err.message);

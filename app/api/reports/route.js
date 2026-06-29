@@ -1,4 +1,4 @@
-import { adminDb } from "@/lib/firebase-admin";
+import { adminDb, adminStorage } from "@/lib/firebase-admin";
 import { verifyAuth, unauthorized } from "@/lib/auth-middleware";
 import { analyzeHazardPhoto } from "@/lib/gemini";
 import { calculatePriorityScore } from "@/lib/triage";
@@ -34,6 +34,19 @@ export async function POST(request) {
     );
   }
 
+  // Upload image to Firebase Storage
+  const imageBuffer = Buffer.from(base64Image, "base64");
+  const fileName = `reports/${user.uid}/${Date.now()}.jpg`;
+  const bucket = adminStorage.bucket();
+  const file = bucket.file(fileName);
+
+  await file.save(imageBuffer, {
+    metadata: { contentType: mimeType ?? "image/jpeg" },
+    public: true,
+  });
+
+  const imageUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+
   // Get report count in zone for corroboration score
   let reportCount = 0;
   if (zoneId) {
@@ -52,6 +65,7 @@ export async function POST(request) {
 
   const report = {
     submittedBy: user.uid,
+    imageUrl,
     location,
     zoneId: zoneId ?? null,
     description: description ?? "",
