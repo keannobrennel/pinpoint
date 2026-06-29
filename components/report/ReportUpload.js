@@ -1,12 +1,28 @@
 "use client";
 
 import { useAuthGuard } from "@/lib/use-auth-guard";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
 import imageCompression from "browser-image-compression";
 
+// Same key BottomNav writes to before navigating here.
+const PENDING_PHOTO_KEY = "pendingReportPhoto";
+
+// Turns the base64 dataUrl handed off via sessionStorage back into a real
+// File object, so the rest of this component (which expects a File/Blob)
+// doesn't need to know the photo came from the nav bar's camera capture.
+function dataUrlToFile(dataUrl, mimeType, filename = "hazard-photo.jpg") {
+  const base64 = dataUrl.split(",")[1];
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new File([bytes], filename, { type: mimeType });
+}
+
 export default function ReportUpload() {
   const { status } = useAuthGuard(["public", "engineer", "admin"]);
+  const router = useRouter();
 
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -17,6 +33,22 @@ export default function ReportUpload() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+
+  // Pick up a photo handed off by the BottomNav camera FAB, if there is one.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(PENDING_PHOTO_KEY);
+      if (!raw) return;
+      sessionStorage.removeItem(PENDING_PHOTO_KEY);
+
+      const { dataUrl, mimeType } = JSON.parse(raw);
+      const file = dataUrlToFile(dataUrl, mimeType);
+      setImage(file);
+      setPreview(dataUrl);
+    } catch (err) {
+      console.error("Failed to load captured photo", err);
+    }
+  }, []);
 
   if (status !== "ready") return null;
 
@@ -107,7 +139,7 @@ export default function ReportUpload() {
       }[aiAssessment.suggestedPlacard] ?? "bg-gray-100 text-gray-800";
 
     return (
-      <div className="max-w-md mx-auto p-6 space-y-4">
+      <div className="flex flex-col gap-4">
         <h2>Report Submitted</h2>
         <p className="text-sm text-gray-500">
           {"Here's the AI pre-assessment of your photo:"}
@@ -163,25 +195,47 @@ export default function ReportUpload() {
   }
 
   return (
-    <div className="max-w-md mx-auto p-6 space-y-4">
-      <h2>Report a Hazard</h2>
-
-      {/* Photo Upload */}
-      <div
-        onClick={() => fileInputRef.current?.click()}
-        className="border-2 border-dashed rounded-lg h-48 flex items-center justify-center cursor-pointer overflow-hidden"
+    <div className="flex flex-col gap-4">
+      {/* Header */}
+      <button
+        type="button"
+        onClick={() => router.back()}
+        className="flex items-center gap-2"
       >
+        <i className="fa-solid fa-arrow-left text-[#2563EB]" aria-hidden="true" />
+        <h2 className="text-[#01277C] font-semibold">Submit a Report</h2>
+      </button>
+
+      {/* Photo */}
+      <div className="flex flex-col gap-2">
+        <h3 className="text-lg font-bold text-[#01277C]">Captured Photo</h3>
+
         {preview ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={preview}
-            alt="Preview"
-            className="object-cover w-full h-full"
-          />
+          <div className="flex gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={preview}
+              alt="Captured hazard"
+              className="flex-1 h-48 rounded-xl object-cover border-2 border-[#D4E1EE]"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-24 rounded-xl border-2 border-blue-500 flex flex-col items-center justify-center gap-2 text-blue-600"
+            >
+              <i className="fa-solid fa-camera text-xl" aria-hidden="true" />
+              <span className="text-xs font-medium">Retake</span>
+            </button>
+          </div>
         ) : (
-          <span className="text-sm text-gray-400">
-            Tap to select or take a photo
-          </span>
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            className="border-2 border-dashed rounded-xl h-48 flex items-center justify-center cursor-pointer overflow-hidden"
+          >
+            <span className="text-sm text-gray-400">
+              Tap to select or take a photo
+            </span>
+          </div>
         )}
       </div>
       <input
@@ -194,7 +248,9 @@ export default function ReportUpload() {
       />
 
       {/* Location */}
-      <div className="space-y-1">
+      <div className="flex flex-col gap-2">
+        <h3 className="text-lg font-bold text-[#01277C]">Pin a location</h3>
+        <div className="space-y-1">
         <button
           onClick={getLocation}
           className="w-full py-2 rounded-lg bg-gray-100 text-sm font-medium"
@@ -206,24 +262,29 @@ export default function ReportUpload() {
         {locationError && (
           <p className="text-xs text-red-500">{locationError}</p>
         )}
+        </div>
       </div>
 
       {/* Description */}
-      <textarea
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        placeholder="Optional: describe what you see"
-        className="w-full border rounded-lg p-3 text-sm resize-none h-24"
-      />
+      <div className="flex flex-col gap-2">
+        <h3 className="text-lg font-semibold text-[#01277C]">Description (Optional)</h3>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Optional: describe what you see"
+          className="w-full border border-[#D4E1EE] rounded-lg p-3 text-sm resize-none h-24"
+        />        
+      </div>
+
 
       {error && <p className="text-sm text-red-500">{error}</p>}
 
       <button
         onClick={handleSubmit}
         disabled={loading}
-        className="w-full py-3 rounded-lg bg-black text-white text-sm font-medium disabled:opacity-50"
+        className="w-full py-4 rounded-xl bg-[#3474FD] text-white text-md font-medium shadow-lg shadow-[#3474FD]/30 disabled:opacity-50"
       >
-        {loading ? "Analyzing photo..." : "Submit Report"}
+        {loading ? "Analyzing photo..." : "Submit report"}
       </button>
     </div>
   );

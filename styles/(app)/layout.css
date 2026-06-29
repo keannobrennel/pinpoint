@@ -14,7 +14,7 @@
   --pp-muted:       #7a8aab;   /* inactive nav labels */
   --pp-border:      #d9e2f3;
 
-  --pp-font:        'Inter', system-ui, sans-serif;
+  --pp-font:        "Plus Jakarta Sans";
 
   --header-h:       64px;
   --bottomnav-h:    72px;
@@ -35,9 +35,9 @@
 .app-content {
   flex: 1;
   overflow-y: auto;
-  /* leave room for sticky header + bottom nav */
-  padding-top: var(--header-h);
-  padding-bottom: calc(var(--bottomnav-h) + 12px);
+  width: 87%;
+  padding-top: 125;
+  height: 100%;
 }
 
 /* ── Header ─────────────────────────────────────────────── */
@@ -50,7 +50,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 18px;
   padding: 40 25 25 25;
 }
 
@@ -118,9 +117,11 @@
 
 /* ── Bottom Nav ─────────────────────────────────────────── */
 .bottom-nav {
+  position: fixed;
+  bottom: 0;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 20;
+  margin: 20 25 20 25;
   width: 87%;
   z-index: 100;
   height: 8%;

@@ -1,11 +1,17 @@
 // components/layout/BottomNav.js
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useRef } from "react";
+import imageCompression from "browser-image-compression";
 
 // usePathname is a Next.js built-in, not a custom hook — safe to keep.
 // Badge count is hardcoded for now; replace with real data later.
 const ALERT_COUNT = 4;
+
+// Key used to hand the captured photo off to the /report page via
+// sessionStorage, since Next.js navigation doesn't carry in-memory state.
+const PENDING_PHOTO_KEY = "pendingReportPhoto";
 
 const NAV_ITEMS = [
   { href: "/home",    label: "Home",    icon: "fa-solid fa-house" },
@@ -15,6 +21,34 @@ const NAV_ITEMS = [
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const router = useRouter();
+  const cameraInputRef = useRef(null);
+
+  const handleCameraCapture = async (e) => {
+    const file = e.target.files[0];
+    // Reset so selecting the same file again later still fires onChange.
+    e.target.value = "";
+    if (!file) return;
+
+    try {
+      const compressed = await imageCompression(file, {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1280,
+        useWebWorker: true,
+      });
+      const dataUrl = await imageCompression.getDataUrlFromFile(compressed);
+      sessionStorage.setItem(
+        PENDING_PHOTO_KEY,
+        JSON.stringify({ dataUrl, mimeType: compressed.type }),
+      );
+    } catch (err) {
+      console.error("Failed to process captured photo", err);
+      // Fall through and still navigate — ReportUpload will just show
+      // its empty upload state if nothing made it into sessionStorage.
+    }
+
+    router.push("/report");
+  };
 
   return (
     <>
@@ -46,10 +80,23 @@ export default function BottomNav() {
           })}
         </ul>
   
-        {/* Floating camera button */}
-        <Link href="/report" className="fab-camera" aria-label="Report a hazard">
+        {/* Floating camera button — opens the native camera directly */}
+        <button
+          type="button"
+          onClick={() => cameraInputRef.current?.click()}
+          className="fab-camera"
+          aria-label="Report a hazard"
+        >
           <i className="fa-solid fa-camera" aria-hidden="true" />
-        </Link>
+        </button>
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={handleCameraCapture}
+        />
       </nav>
 
     </>
