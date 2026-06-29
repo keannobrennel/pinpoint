@@ -170,6 +170,7 @@ export default function ReportUpload() {
         className="border-2 border-dashed rounded-lg h-48 flex items-center justify-center cursor-pointer overflow-hidden"
       >
         {preview ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={preview}
             alt="Preview"
