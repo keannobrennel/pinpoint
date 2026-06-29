@@ -2,16 +2,17 @@
 
 ## Branch Structure
 
-| Branch | Purpose |
-|--------|---------|
-| `main` | Production-ready code only. Protected — no direct pushes. |
-| `dev` | Active development integration branch. All feature branches merge here first. |
-| `feat/<name>` | Feature branches (e.g. `feat/gemini-pipeline`, `feat/heatmap`) |
-| `fix/<name>` | Bug fix branches |
+| Branch        | Purpose                                                                       |
+| ------------- | ----------------------------------------------------------------------------- |
+| `main`        | Production-ready code only. Protected — no direct pushes.                     |
+| `dev`         | Active development integration branch. All feature branches merge here first. |
+| `feat/<name>` | Feature branches (e.g. `feat/gemini-pipeline`, `feat/heatmap`)                |
+| `fix/<name>`  | Bug fix branches                                                              |
 
 ## Workflow
 
 1. **Branch off `dev`**, never `main`
+
    ```bash
    git checkout dev
    git pull origin dev
@@ -31,20 +32,22 @@
 ## Commit Message Convention
 
 Format:
+
 ```
 type: short description in lowercase
 ```
 
-| Type | When to use |
-|------|-------------|
-| `feat:` | Adding a new feature |
-| `fix:` | Fixing a bug |
-| `chore:` | Setup, config, non-code changes |
-| `style:` | UI/CSS changes only |
+| Type        | When to use                                  |
+| ----------- | -------------------------------------------- |
+| `feat:`     | Adding a new feature                         |
+| `fix:`      | Fixing a bug                                 |
+| `chore:`    | Setup, config, non-code changes              |
+| `style:`    | UI/CSS changes only                          |
 | `refactor:` | Restructuring code without changing behavior |
-| `docs:` | README, comments, documentation |
+| `docs:`     | README, comments, documentation              |
 
 **Examples:**
+
 ```
 feat: add Gemini Vision validation pipeline
 feat: implement heatmap density layer
@@ -55,6 +58,7 @@ docs: add setup instructions to CONTRIBUTING
 ```
 
 **Rules:**
+
 - Always lowercase after the colon
 - Keep it short and specific — one line
 - Use present tense ("add" not "added")
@@ -64,11 +68,13 @@ docs: add setup instructions to CONTRIBUTING
 ## Environment Setup
 
 Copy `.env.example` to `.env.local` and fill in your keys:
+
 ```bash
 cp .env.example .env.local
 ```
 
 Required keys:
+
 - `NEXT_PUBLIC_FIREBASE_*` — Firebase project config
 - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` — Google Maps Platform
 - `GEMINI_API_KEY` — Gemini Vision Flash API
