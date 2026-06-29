@@ -1,10 +1,13 @@
 "use client";
 
+import { useAuthGuard } from "@/lib/use-auth-guard";
 import { useState, useRef } from "react";
 import { auth } from "@/lib/firebase";
 import imageCompression from "browser-image-compression";
 
 export default function ReportUpload() {
+  const { status } = useAuthGuard(["public", "engineer", "admin"]);
+
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [location, setLocation] = useState(null);
@@ -15,9 +18,16 @@ export default function ReportUpload() {
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
 
+  if (status !== "ready") return null;
+
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    if (file.size > 20 * 1024 * 1024) {
+      setError("Image must be under 20MB.");
+      return;
+    }
 
     const compressed = await imageCompression(file, {
       maxSizeMB: 1,
@@ -56,16 +66,10 @@ export default function ReportUpload() {
     setResult(null);
 
     try {
-      console.log("Starting submission...");
       const base64 = await imageCompression.getDataUrlFromFile(image);
-      console.log("base64 done, length:", base64.length);
       const base64Data = base64.split(",")[1];
       const mimeType = image.type;
-      console.log("mimeType:", mimeType);
-
       const token = await auth.currentUser.getIdToken();
-      console.log("token acquired");
-
       const res = await fetch("/api/reports", {
         method: "POST",
         headers: {
@@ -81,8 +85,6 @@ export default function ReportUpload() {
       });
 
       const data = await res.json();
-      console.log("API response:", res.status, data);
-
       if (!res.ok) {
         setError(data.error ?? "Submission failed.");
       } else {
