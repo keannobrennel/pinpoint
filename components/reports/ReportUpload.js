@@ -56,15 +56,11 @@ export default function ReportUpload() {
     setResult(null);
 
     try {
-      console.log("Starting submission...");
       const base64 = await imageCompression.getDataUrlFromFile(image);
-      console.log("base64 done, length:", base64.length);
       const base64Data = base64.split(",")[1];
       const mimeType = image.type;
-      console.log("mimeType:", mimeType);
 
       const token = await auth.currentUser.getIdToken();
-      console.log("token acquired");
 
       const res = await fetch("/api/reports", {
         method: "POST",
@@ -81,7 +77,6 @@ export default function ReportUpload() {
       });
 
       const data = await res.json();
-      console.log("API response:", res.status, data);
 
       if (!res.ok) {
         setError(data.error ?? "Submission failed.");

@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useAuthGuard } from "@/lib/use-auth-guard";
 import { useZonesFeed } from "@/lib/use-dashboard-data";
@@ -38,6 +41,7 @@ async function callAdminApi(path, body) {
 }
 
 export default function AdminPage() {
+  const router = useRouter();
   const { status } = useAuthGuard(ALLOWED_ROLES);
   const { zones, loading: zonesLoading } = useZonesFeed();
 
@@ -55,9 +59,22 @@ export default function AdminPage() {
   const [togglingZoneId, setTogglingZoneId] = useState(null);
   const [toggleMessage, setToggleMessage] = useState(null);
 
+  const [signingOut, setSigningOut] = useState(false);
+
   if (status !== "ready") {
     return null;
   }
+
+  const handleLogout = async () => {
+    setSigningOut(true);
+    try {
+      await signOut(auth);
+      router.replace("/login");
+    } catch (err) {
+      console.error("Logout error:", err);
+      setSigningOut(false);
+    }
+  };
 
   const handleCreateEngineer = async (e) => {
     e.preventDefault();
@@ -119,10 +136,29 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="border-b border-gray-200 bg-white px-4 py-3 sm:px-6">
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto flex max-w-4xl items-center justify-between">
           <h1 className="text-base font-semibold text-gray-900">Admin panel</h1>
+          <button
+            type="button"
+            onClick={handleLogout}
+            disabled={signingOut}
+            className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+          >
+            {signingOut ? "Signing out…" : "Sign out"}
+          </button>
         </div>
       </header>
+
+      <nav className="border-b border-gray-200 bg-white px-4 sm:px-6">
+        <div className="mx-auto max-w-4xl flex gap-6">
+          <Link href="/admin" className="px-1 py-3 text-xs font-medium text-gray-700 border-b-2 border-gray-900">
+            Dashboard
+          </Link>
+          <Link href="/admin/engineers" className="px-1 py-3 text-xs font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent">
+            Engineer Management
+          </Link>
+        </div>
+      </nav>
 
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6 sm:px-6">
         <section className="rounded-lg border border-gray-200 bg-white p-4">
