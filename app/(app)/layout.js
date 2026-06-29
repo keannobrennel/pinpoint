@@ -3,6 +3,8 @@
 // Both Residents and Engineers pass through this same layout —
 // the role-specific differences happen INSIDE each page, not here.
 "use client";
+import "@/styles/(app)/layout.css";
+import Header from "@/components/layout/Header";
 import BottomNav from "@/components/layout/BottomNav";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -15,6 +17,7 @@ export default function AppLayout({ children }) {
 
   return (
     <div className="app-shell">
+      <Header />
       <main className="app-content">{children}</main>
       <BottomNav />
     </div>
