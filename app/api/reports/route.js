@@ -35,12 +35,14 @@ export async function POST(request) {
   }
 
   // Get report count in zone for corroboration score
-  const zoneReportsSnap = await adminDb
-    .collection("reports")
-    .where("zoneId", "==", zoneId)
-    .get();
-
-  const reportCount = zoneReportsSnap.size;
+  let reportCount = 0;
+  if (zoneId) {
+    const zoneReportsSnap = await adminDb
+      .collection("reports")
+      .where("zoneId", "==", zoneId)
+      .get();
+    reportCount = zoneReportsSnap.size;
+  }
 
   const priorityScore = calculatePriorityScore(
     aiAssessment,
