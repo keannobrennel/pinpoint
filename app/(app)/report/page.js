@@ -1,4 +1,4 @@
-import ReportUpload from "@/components/reports/ReportUpload";
+import ReportUpload from "@/components/report/ReportUpload";
 
 export const metadata = {
   title: "Report a Hazard — PinPoint",
