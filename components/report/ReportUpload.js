@@ -20,6 +20,14 @@ function dataUrlToFile(dataUrl, mimeType, filename = "hazard-photo.jpg") {
   return new File([bytes], filename, { type: mimeType });
 }
 
+// Placard styling — background/text colors for the pill, matching the
+// "RESTRICTED USE" orange treatment in the mockup.
+const PLACARD_STYLES = {
+  inspected: "bg-green-50 text-green-700",
+  restricted_use: "bg-orange-50 text-orange-600",
+  unsafe: "bg-red-50 text-red-700",
+};
+
 export default function ReportUpload() {
   const { status } = useAuthGuard(["public", "engineer", "admin"]);
   const router = useRouter();
@@ -132,48 +140,58 @@ export default function ReportUpload() {
   if (result) {
     const { aiAssessment } = result;
     const placardColor =
-      {
-        inspected: "bg-green-100 text-green-800",
-        restricted_use: "bg-yellow-100 text-yellow-800",
-        unsafe: "bg-red-100 text-red-800",
-      }[aiAssessment.suggestedPlacard] ?? "bg-gray-100 text-gray-800";
+      PLACARD_STYLES[aiAssessment.suggestedPlacard] ?? "bg-gray-100 text-gray-700";
 
     return (
-      <div className="flex flex-col gap-4">
-        <h2>Report Submitted</h2>
-        <p className="text-sm text-gray-500">
+      <div className="flex flex-col gap-1">
+        {/* Mascot */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <div className="flex flex-col items-center gap-1 text-center">
+          <img
+            src="/images/chick3.png"
+            alt=""
+            aria-hidden="true"
+            className="h-30 object-contain"
+          />
+
+          <h2 className="text-2xl font-extrabold text-[#01277C] mb-3">
+            Report Submitted🎉
+          </h2>          
+        </div>
+
+        <p className="text-sm text-gray-500 mb-3 text-start">
           {"Here's the AI pre-assessment of your photo:"}
         </p>
 
-        <div className={`rounded-lg p-4 font-medium text-sm ${placardColor}`}>
-          Suggested Placard:{" "}
+        <span className="text-[#01277C] text-sm font-semibold">Suggested Placard: </span>
+        <div className={`w-full rounded-full py-2 font-bold text-sm ${placardColor} text-center border border-[#FDE7C3]`}>
           {aiAssessment.suggestedPlacard.replace("_", " ").toUpperCase()}
         </div>
 
-        <div className="rounded-lg border p-4 space-y-2 text-sm">
+        <div className="w-full text-left rounded-2xl border border-[#D4E1EE] p-4 flex flex-col gap-2 text-sm">
           <div>
-            <span className="font-medium">Damage: </span>
+            <span className="font-semibold">Damage: </span>
             {aiAssessment.damageClassification}
           </div>
           <div>
-            <span className="font-medium">Severity: </span>
+            <span className="font-semibold">Severity: </span>
             {aiAssessment.severityScore} / 100
           </div>
           <div>
-            <span className="font-medium">Structure: </span>
+            <span className="font-semibold">Structure: </span>
             {aiAssessment.affectedStructureType}
           </div>
           <div>
-            <span className="font-medium">Summary: </span>
+            <span className="font-semibold">Summary: </span>
             {aiAssessment.placardReasoning}
           </div>
           <div>
-            <span className="font-medium">Recommended Action: </span>
+            <span className="font-semibold">Recommended Action: </span>
             {aiAssessment.recommendedAction}
           </div>
         </div>
 
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-gray-400 italic mt-2">
           This is an AI pre-assessment only. An engineer will review and post an
           official verdict for your zone.
         </p>
@@ -186,9 +204,9 @@ export default function ReportUpload() {
             setLocation(null);
             setDescription("");
           }}
-          className="w-full py-2 rounded-lg border text-sm"
+          className="w-full py-4 mt-3 rounded-xl border border-[#3474FD] text-[#3474FD] text-md font-medium"
         >
-          Submit Another Report
+          Submit another report
         </button>
       </div>
     );
