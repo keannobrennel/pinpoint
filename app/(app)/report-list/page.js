@@ -1,10 +1,10 @@
-// app/(app)/reports/page.js
+// app/(app)/report-list/page.js
 "use client";
 
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import MyReportsList from "@/components/reports/MyReportsList";
-import CommunityStats from "@/components/reports/CommunityStats";
+import MyReportsList from "@/components/report-list/MyReportsList";
+import CommunityStats from "@/components/report-list/CommunityStats";
 
 export default function ReportsPage() {
   const { role } = useAuth();

@@ -1,4 +1,4 @@
-// components/reports/CommunityStats.jsx
+// components/report-list/CommunityStats.jsx
 "use client";
 
 import { useEffect, useState } from "react";

@@ -1,4 +1,4 @@
-// components/reports/ReportCard.jsx
+// components/report-list/ReportCard.jsx
 import Link from "next/link";
 
 // Status badge styles map directly to your design's pill colors

@@ -7,7 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 const navItems = [
   { href: "/home", label: "Home", icon: "🏠" },
   { href: "/alerts", label: "Alerts", icon: "🔔" },
-  { href: "/reports", label: "Reports", icon: "📄" },
+  { href: "/report-list", label: "Reports", icon: "📄" },
 ];
 
 export default function BottomNav() {

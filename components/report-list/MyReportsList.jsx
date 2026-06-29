@@ -1,4 +1,4 @@
-// components/reports/MyReportsList.jsx
+// components/report-list/MyReportsList.jsx
 "use client";
 
 import { useEffect, useState } from "react";
