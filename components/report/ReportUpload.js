@@ -108,7 +108,7 @@ export default function ReportUpload() {
 
     return (
       <div className="max-w-md mx-auto p-6 space-y-4">
-        <h2 className="text-xl font-semibold">Report Submitted</h2>
+        <h2>Report Submitted</h2>
         <p className="text-sm text-gray-500">
           {"Here's the AI pre-assessment of your photo:"}
         </p>
@@ -164,7 +164,7 @@ export default function ReportUpload() {
 
   return (
     <div className="max-w-md mx-auto p-6 space-y-4">
-      <h2 className="text-xl font-semibold">Report a Hazard</h2>
+      <h2>Report a Hazard</h2>
 
       {/* Photo Upload */}
       <div
