@@ -5,13 +5,14 @@
 
 /* ── Tokens ──────────────────────────────────────────────── */
 :root {
-  --pp-navy:        #01277C;   /* primary text / active nav */
-  --pp-orange:      #F97316;   /* CTA / badge / active accent */
-  --pp-orange-dark: #d96b10;   /* hover / pressed */
+  --pp-navy:        #01277C;  
+  --pp-main:        #2563EB;
+  --pp-orange:      #F97316;  
+  --pp-orange-dark: #d96b10;  
   --pp-white:       #ffffff;
-  --pp-bg:          #eef2fb;   /* light blue-grey app bg */
+  --pp-bg:          #eef2fb;  
   --pp-surface:     #ffffff;
-  --pp-muted:       #7a8aab;   /* inactive nav labels */
+  --pp-muted:       #7a8aab;  
   --pp-border:      #d9e2f3;
 
   --pp-font:        "Plus Jakarta Sans";
@@ -31,11 +32,9 @@
 .app-content {
   flex: 1;
   overflow-y: auto;
-  width: 87%;
+  width: 100%;
   height: 100%;
-  /* No padding-top here — each page owns its own top spacing,
-     since Home uses a fixed Header (needs clearance) while
-     Alerts/Reports use in-flow headers (don't). */
+  padding: 0 25px;
 }
 
 /* ── Header ─────────────────────────────────────────────── */
@@ -48,14 +47,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 40px 30px 25px 30px;
+  margin: 40px 25px 25px 25px;
 }
 
 /* Logo group */
 .header-logo {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
 }
 
 .logo-pin {
@@ -70,7 +69,7 @@
 
 .logo-text {
   margin-bottom: 4px;
-  font-size: 30px;
+  font-size: 28px;
   color: #2563EB;
   font-weight: 900;
   line-height: 1.1;
@@ -85,8 +84,8 @@
 
 /* Avatar button */
 .header-avatar {
-  width: 52px;
-  height: 52px;
+  width: 47px;
+  height: 47px;
   border-radius: 50%;
   border: none;
   padding: 0;
@@ -114,6 +113,9 @@
   background: var(--pp-orange);
 }
 
+
+
+
 /* ── Bottom Nav ─────────────────────────────────────────── */
 .bottom-nav {
   position: fixed;
@@ -121,12 +123,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 20 30 20 30;
+  margin: 20px 25px 20px 25px;
   right: 0;
   left: 0;
   z-index: 100;
   height: 8%;
-  gap: 17;
+  gap: 13;
 }
 
 .bottom-nav__list {
@@ -171,12 +173,12 @@
 }
 
 .bottom-nav__icon-wrap i {
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1;
 }
 
 .bottom-nav__label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   line-height: 1;
 }
@@ -201,9 +203,12 @@
   border: 2px solid var(--pp-white);
 }
 
+
+
+
 /* ── FAB (floating camera button) ───────────────────────── */
 .fab-camera {
-  width: 65px;
+  width: 60px;
   aspect-ratio: 1/1;
   border-radius: 50%;
   background: linear-gradient(135deg, #3474FF, #1E51A9);
@@ -226,6 +231,9 @@
   font-size: 27px;
 }
 
+
+
+
 /* ── Loading state ───────────────────────────────────────── */
 .screen-loading {
   display: flex;
@@ -235,4 +243,315 @@
   font-family: var(--pp-font);
   color: var(--pp-muted);
   font-size: 14px;
+}
+
+
+
+
+/* ── List Screen Shell ───────────────────────────────────── */
+/* Used by Community, Reports, Incidents pages */
+
+.list-screen {
+  display: flex;
+  flex-direction: column;
+  padding-top: 40px;
+  gap: 12px;
+  height: 100%;
+}
+
+.list-screen__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.list-screen__title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.list-screen__title {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--pp-main);
+  line-height: 1.1;
+}
+
+.list-screen__subtitle {
+  font-size: 12px;
+  color: var(--pp-muted);
+  font-weight: 400;
+}
+
+.list-screen__filter-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1.5px solid var(--pp-border);
+  background: var(--pp-white);
+  color: var(--pp-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.list-screen__filter-btn i {
+  font-size: 16px;
+}
+
+.list-screen__content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 100px; /* clearance for fixed bottom nav */
+}
+
+
+
+
+/* ── Filter Bar ──────────────────────────────────────────── */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-bar__pill {
+  padding: 6px 14px;
+  border-radius: 50px;
+  border: 1.5px solid var(--pp-border);
+  background: var(--pp-white);
+  color: var(--pp-muted);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--pp-font);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.filter-bar__pill--active {
+  background: var(--pp-navy);
+  color: var(--pp-white);
+  border-color: var(--pp-navy);
+}
+
+
+
+/* ── Status Badge ────────────────────────────────────────── */
+.status-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.status-badge--verified  { background: #22c55e; color: #fff; }
+.status-badge--pending   { background: #f59e0b; color: #fff; }
+.status-badge--unsafe    { background: #ef4444; color: #fff; }
+.status-badge--assessed  { background: #3b82f6; color: #fff; }
+.status-badge--default   { background: var(--pp-border); color: var(--pp-navy); }
+
+/* ── Phase Pill ──────────────────────────────────────────── */
+.phase-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 50px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.phase-pill--post    { background: #fff0e0; color: #f97316; }
+.phase-pill--pre     { background: #e0eaff; color: #2563eb; }
+.phase-pill--default { background: var(--pp-border); color: var(--pp-muted); }
+
+/* ── Report Card / Incident Card ─────────────────────────── */
+/* Both cards share the same shell — .report-card */
+.report-card {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  background: var(--pp-white);
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(26, 43, 94, 0.08);
+  text-align: left;
+  cursor: pointer;
+  border: none;
+  transition: box-shadow 0.15s;
+}
+
+.report-card:active {
+  box-shadow: 0 1px 4px rgba(26, 43, 94, 0.12);
+}
+
+/* Thumbnail */
+.report-card__img-wrap {
+  position: relative;
+  width: 96px;
+  min-width: 96px;
+  height: 96px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--pp-border);
+  flex-shrink: 0;
+}
+
+.report-card__img {
+  object-fit: cover;
+}
+
+.report-card__img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pp-muted);
+  font-size: 24px;
+}
+
+/* Body */
+.report-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.report-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.report-card__arrow {
+  color: #2563eb;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.report-card__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--pp-navy);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.report-card__location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--pp-muted);
+}
+
+.report-card__location i {
+  font-size: 11px;
+  color: var(--pp-muted);
+}
+
+.report-card__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--pp-muted);
+}
+
+.report-card__count {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  color: var(--pp-navy);
+  font-size: 12px;
+}
+
+.report-card__count i {
+  font-size: 12px;
+}
+
+
+/* ── Announcement Card (Community page) ──────────────────── */
+.announcement-card {
+  background: var(--pp-white);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 2px 8px rgba(26, 43, 94, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.announcement-card__type {
+  font-size: 10px;
+  font-weight: 700;
+  color: #f97316;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.announcement-card__time {
+  font-size: 11px;
+  color: var(--pp-muted);
+  margin-top: -2px;
+  align-self: flex-end;
+  position: absolute;
+  right: 14px; /* handled via flex row below if needed */
+}
+
+.announcement-card__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--pp-navy);
+}
+
+.announcement-card__location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--pp-muted);
+}
+
+.announcement-card__location i {
+  font-size: 11px;
+}
+
+.announcement-card__body {
+  font-size: 12px;
+  color: #374151;
+  line-height: 1.5;
+  margin-top: 2px;
+}
+
+.announcement-card__posted-by {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #22c55e;
+  margin-top: 4px;
+}
+
+.announcement-card__posted-by i {
+  font-size: 12px;
 }
