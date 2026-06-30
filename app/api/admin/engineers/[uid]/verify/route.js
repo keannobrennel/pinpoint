@@ -1,5 +1,5 @@
 import { adminDb } from "@/lib/firebase-admin";
-import { verifyCallerRole } from "@/lib/verifiy-admin";
+import { verifyCallerRole } from "@/lib/verify-admin";
 
 /**
  * PATCH /api/admin/engineers/[uid]/verify
