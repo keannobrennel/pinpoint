@@ -2,6 +2,7 @@
 "use client";
 
 import { useAuth } from "@/hooks/useAuth";
+import Header from "@/components/layout/Header";
 import Greeting from "@/components/home/Greeting";
 import HomeBottomCard from "@/components/home/HomeBottomCard";
 import MapView from "@/components/map/MapView";
@@ -36,6 +37,7 @@ export default function HomePage() {
 
   return (
     <div className="home-page">
+      <Header userName={user?.name} />
       <Greeting isEngineer={isEngineer} userName={user?.name} />
 
       <MapView />

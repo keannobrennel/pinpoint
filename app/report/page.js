@@ -1,9 +1,9 @@
-import ReportUpload from "@/components/report/ReportUpload";
+import ReportSubmission from "@/components/report/ReportSubmission";
 
 export const metadata = {
   title: "Report a Hazard — PinPoint",
 };
 
 export default function ReportPage() {
-  return <ReportUpload />;
+  return <ReportSubmission />;
 }
