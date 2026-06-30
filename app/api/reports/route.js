@@ -1,4 +1,4 @@
-import { adminDb } from "@/lib/firebase-admin";
+import { adminDb, adminStorage } from "@/lib/firebase-admin";
 import { verifyAuth, unauthorized } from "@/lib/auth-middleware";
 import { analyzeHazardPhoto } from "@/lib/gemini";
 import { calculatePriorityScore } from "@/lib/triage";
@@ -9,7 +9,15 @@ export async function POST(request) {
   if (!user) return unauthorized();
 
   const body = await request.json();
-  const { base64Image, mimeType, location, zoneId, description } = body;
+  const {
+    base64Image,
+    mimeType,
+    location,
+    city,
+    barangay,
+    zoneId,
+    description,
+  } = body;
 
   if (!base64Image || !location) {
     return new Response(JSON.stringify({ error: "Missing required fields" }), {
@@ -34,6 +42,19 @@ export async function POST(request) {
     );
   }
 
+  // Upload image to Firebase Storage
+  const imageBuffer = Buffer.from(base64Image, "base64");
+  const fileName = `reports/${user.uid}/${Date.now()}.jpg`;
+  const bucket = adminStorage.bucket();
+  const file = bucket.file(fileName);
+
+  await file.save(imageBuffer, {
+    metadata: { contentType: mimeType ?? "image/jpeg" },
+    public: true,
+  });
+
+  const imageUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+
   // Get report count in zone for corroboration score
   let reportCount = 0;
   if (zoneId) {
@@ -50,16 +71,37 @@ export async function POST(request) {
     new Date(),
   );
 
+  // Responders and admins auto-verify their own submissions — they skip
+  // the queue entirely by design (spec section 1.3 covers responders;
+  // extending the same trust to admin since they're top of the role chain).
+  const isAutoVerifier =
+    user.role === "responder" ||
+    user.role === "admin" ||
+    user.role === "engineer";
+  const now = new Date().toISOString();
+
   const report = {
     submittedBy: user.uid,
+    imageUrl,
     location,
+    city: city ?? null,
+    barangay: barangay ?? null,
     zoneId: zoneId ?? null,
     description: description ?? "",
     aiAssessment,
     priorityScore,
-    status: "pending",
-    engineerVerdict: null,
-    reportedAt: new Date().toISOString(),
+    status: isAutoVerifier ? "auto_verified" : "pending",
+    verificationStatus: isAutoVerifier ? "verified_true" : "unverified",
+    verifiedBy: isAutoVerifier ? user.uid : null,
+    verifiedByName: isAutoVerifier ? (user.displayName ?? null) : null,
+    verifiedByRole: isAutoVerifier ? user.role : null,
+    verifiedAt: isAutoVerifier ? now : null,
+    responderNote: null,
+    isAutoVerified: isAutoVerifier,
+    archivedAt: null,
+    archivedReason: null,
+    engineerAssessment: null,
+    reportedAt: now,
   };
 
   const docRef = await adminDb.collection("reports").add(report);
@@ -75,17 +117,18 @@ export async function GET(request) {
   const user = await verifyAuth(request);
   if (!user) return unauthorized();
 
-  if (user.role === "citizen") {
-    return new Response(JSON.stringify({ error: "Forbidden" }), {
-      status: 403,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
+  let query = adminDb.collection("reports").orderBy("priorityScore", "desc");
 
-  const snap = await adminDb
-    .collection("reports")
-    .orderBy("priorityScore", "desc")
-    .get();
+  if (user.role === "public") {
+    // Public users only ever see their own reports.
+    query = query.where("submittedBy", "==", user.uid);
+  } else if (user.role === "responder") {
+    // Responders see everything except archived/false reports.
+    query = query.where("status", "!=", "verified_false");
+  }
+  // engineer/admin: no filter, see everything including archived.
+
+  const snap = await query.get();
 
   const reports = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 

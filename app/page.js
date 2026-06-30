@@ -1,7 +1,7 @@
 export default function Home() {
   return (
     <main>
-      <h1>PinPoint</h1>
+      <h1>PinPoint Landing</h1>
     </main>
   );
 }
