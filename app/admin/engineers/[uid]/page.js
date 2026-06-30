@@ -41,6 +41,13 @@ async function callAdminApi(path, method = "GET", body = null) {
 
 export default function EngineerDetailPage({ params }) {
   const router = useRouter();
+
+  useEffect(() => {
+    router.replace("/admin/users");
+  }, [router]);
+
+  return null;
+
   const { status } = useAuthGuard(ALLOWED_ROLES);
   const { uid } = params;
 

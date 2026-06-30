@@ -112,27 +112,33 @@ export async function POST(request) {
   });
 }
 
-// GET /api/reports — fetch all reports (engineers/admin only)
+// GET /api/reports — fetch all reports for staff, or own reports for public users
 export async function GET(request) {
   const user = await verifyAuth(request);
   if (!user) return unauthorized();
 
-  let query = adminDb.collection("reports").orderBy("priorityScore", "desc");
+  const isStaff = user.role === "engineer" || user.role === "admin" || user.role === "responder";
 
-  if (user.role === "public") {
-    // Public users only ever see their own reports.
-    query = query.where("submittedBy", "==", user.uid);
-  } else if (user.role === "responder") {
-    // Responders see everything except archived/false reports.
-    query = query.where("status", "!=", "verified_false");
-  }
-  // engineer/admin: no filter, see everything including archived.
+  const ref = adminDb.collection("reports");
+  const snap = isStaff
+    ? await ref.orderBy("priorityScore", "desc").get()
+    : await ref.where("submittedBy", "==", user.uid).get();
 
-  const snap = await query.get();
+  const reports = snap.docs
+    .map((doc) => ({ id: doc.id, ...doc.data() }))
+    .sort((a, b) => {
+      if (isStaff) {
+        return (b.priorityScore ?? 0) - (a.priorityScore ?? 0);
+      }
 
-  const reports = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      return new Date(b.reportedAt ?? 0) - new Date(a.reportedAt ?? 0);
+    });
 
-  return new Response(JSON.stringify(reports), {
+  const filteredReports = user.role === "responder"
+    ? reports.filter((report) => report.status !== "verified_false")
+    : reports;
+
+  return new Response(JSON.stringify(filteredReports), {
     status: 200,
     headers: { "Content-Type": "application/json" },
   });

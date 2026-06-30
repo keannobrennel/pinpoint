@@ -1,5 +1,5 @@
 import { adminAuth, adminDb } from "@/lib/firebase-admin";
-import { verifyCallerRole } from "@/lib/verifiy-admin";
+import { verifyCallerRole } from "@/lib/verify-admin";
 
 /**
  * POST /api/admin/engineers

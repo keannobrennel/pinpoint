@@ -154,8 +154,8 @@ export default function AdminPage() {
           <Link href="/admin" className="px-1 py-3 text-xs font-medium text-gray-700 border-b-2 border-gray-900">
             Dashboard
           </Link>
-          <Link href="/admin/engineers" className="px-1 py-3 text-xs font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent">
-            Engineer Management
+          <Link href="/admin/users" className="px-1 py-3 text-xs font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent">
+            User Management
           </Link>
         </div>
       </nav>

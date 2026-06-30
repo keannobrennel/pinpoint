@@ -9,7 +9,7 @@ import { useReportsFeed, useZonesFeed } from "@/lib/use-dashboard-data";
 import ZoneCard from "@/components/dashboard/ZoneCard";
 import TriageFeed from "@/components/dashboard/TriageFeed";
 
-const ALLOWED_ROLES = ["engineer", "admin"];
+const ALLOWED_ROLES = ["engineer", "responder", "admin"];
 
 export default function DashboardPage() {
   const router = useRouter();
