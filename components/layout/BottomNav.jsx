@@ -1,28 +1,32 @@
-// components/layout/BottomNav.js
+// components/layout/BottomNav.jsx
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useRef } from "react";
 import imageCompression from "browser-image-compression";
-
-// usePathname is a Next.js built-in, not a custom hook — safe to keep.
-// Badge count is hardcoded for now; replace with real data later.
-const ALERT_COUNT = 4;
+import { useAuth } from "@/hooks/useAuth";
 
 // Key used to hand the captured photo off to the /report page via
 // sessionStorage, since Next.js navigation doesn't carry in-memory state.
 const PENDING_PHOTO_KEY = "pendingReportPhoto";
 
-const NAV_ITEMS = [
-  { href: "/home",    label: "Home",    icon: "fa-solid fa-house" },
-  { href: "/alerts",  label: "Alerts",  icon: "fa-solid fa-bell",       badge: true },
-  { href: "/report-list", label: "Reports", icon: "fa-solid fa-file-lines" },
+// Tabs are additive by role — each role gets everything the previous,
+// less-privileged role gets, plus one more tab.
+//   public:    Home, Community
+//   responder: Home, Community, Reports
+//   engineer:  Home, Community, Reports, Incidents
+const ALL_NAV_ITEMS = [
+  { href: "/home",      label: "Home",      icon: "fa-solid fa-house",                  roles: ["public", "responder", "engineer"] },
+  { href: "/community", label: "Community", icon: "fa-solid fa-bullhorn",               roles: ["public", "responder", "engineer"] },
+  { href: "/reports",   label: "Reports",   icon: "fa-solid fa-file-lines",             roles: ["responder", "engineer"] },
+  { href: "/incidents", label: "Incidents", icon: "fa-solid fa-triangle-exclamation",   roles: ["engineer"] },
 ];
 
 export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const cameraInputRef = useRef(null);
+  const { role, loading } = useAuth();
 
   const handleCameraCapture = async (e) => {
     const file = e.target.files[0];
@@ -50,13 +54,19 @@ export default function BottomNav() {
     router.push("/report");
   };
 
+  // Avoid flashing tabs before role resolves. The parent layout.js already
+  // handles the full-screen loading state, so returning null here just
+  // keeps the nav slot empty for that brief moment.
+  if (loading) return null;
+
+  const NAV_ITEMS = ALL_NAV_ITEMS.filter((item) => item.roles.includes(role));
+
   return (
     <>
       <nav className="bottom-nav" aria-label="Main navigation">
         <ul className="bottom-nav__list">
-          {NAV_ITEMS.map(({ href, label, icon, badge }) => {
+          {NAV_ITEMS.map(({ href, label, icon }) => {
             const active = pathname.startsWith(href);
-            const count  = badge ? ALERT_COUNT : 0;
 
             return (
               <li key={href} className="bottom-nav__item">
@@ -67,11 +77,6 @@ export default function BottomNav() {
                 >
                   <span className="bottom-nav__icon-wrap">
                     <i className={icon} aria-hidden="true" />
-                    {count > 0 && (
-                      <span className="bottom-nav__badge" aria-label={`${count} unread alerts`}>
-                        {count > 9 ? "9+" : count}
-                      </span>
-                    )}
                   </span>
                   <span className="bottom-nav__label">{label}</span>
                 </Link>
@@ -79,7 +84,7 @@ export default function BottomNav() {
             );
           })}
         </ul>
-  
+
         {/* Floating camera button — opens the native camera directly */}
         <button
           type="button"
@@ -98,7 +103,6 @@ export default function BottomNav() {
           onChange={handleCameraCapture}
         />
       </nav>
-
     </>
   );
 }

@@ -53,7 +53,7 @@ export default function LoginPage() {
     try {
       const { user } = await signInWithEmailAndPassword(auth, email, password);
       await ensureUserDoc(user);
-      router.push("/");
+      router.push("/home");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -66,7 +66,7 @@ export default function LoginPage() {
       {/* Hero area — relative + fixed height so fill works */}
       <div className="relative h-64 w-full overflow-hidden">
         <Image
-          src="/images/city1.png"
+          src="/images/city.png"
           alt="City skyline"
           fill
           priority

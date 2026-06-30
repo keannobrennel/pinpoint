@@ -18,7 +18,7 @@ export function useAuth() {
 
       const tokenResult = await firebaseUser.getIdTokenResult();
       setUser(firebaseUser);
-      setRole(tokenResult.claims.role ?? "citizen");
+      setRole(tokenResult.claims.role ?? "public");
       setLoading(false);
     });
 
