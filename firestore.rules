@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection
+    match /users/{userId} {
+      allow read: if request.auth != null;
+
+      // Allow the authenticated user to create their own profile, but only with role "public"
+      allow create: if request.auth != null
+                    && request.auth.uid == userId
+                    && request.resource.data.role == "public"
+                    && request.resource.data.email == request.auth.token.email;
+
+      // Allow updates when:
+      // - admin can update anything
+      // - owner can update but must not change the role
+      allow update: if request.auth != null && (
+        request.auth.token.role == "admin" ||
+        (request.auth.uid == userId && request.resource.data.role == resource.data.role)
+      );
+
+      // Only admins can delete user profiles
+      allow delete: if request.auth != null && request.auth.token.role == "admin";
+    }
+
+    // Reports: owners can create, public can read, and certain actions limited by role
+    match /reports/{reportId} {
+      allow read: if true;
+
+      // Allow create only when authenticated and submittedBy matches
+      allow create: if request.auth != null
+                    && request.auth.uid == request.resource.data.submittedBy;
+
+      // Allow update for admins and engineers; owners can update non-verified fields
+      allow update: if request.auth != null && (
+        request.auth.token.role in ["admin", "engineer"] ||
+        (request.auth.uid == resource.data.submittedBy && request.resource.data.verified == resource.data.verified)
+      );
+    }
+
+    // Default deny for everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

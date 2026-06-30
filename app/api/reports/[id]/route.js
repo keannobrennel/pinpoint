@@ -15,7 +15,17 @@ export async function GET(request, { params }) {
     });
   }
 
-  return new Response(JSON.stringify({ id: doc.id, ...doc.data() }), {
+  const data = doc.data();
+  const isStaff = user.role === "engineer" || user.role === "admin" || user.role === "responder";
+
+  if (!isStaff && data.submittedBy !== user.uid) {
+    return new Response(JSON.stringify({ error: "Forbidden" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  return new Response(JSON.stringify({ id: doc.id, ...data }), {
     status: 200,
     headers: { "Content-Type": "application/json" },
   });

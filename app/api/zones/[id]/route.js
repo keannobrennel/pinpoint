@@ -3,7 +3,7 @@ import { verifyAuth, unauthorized } from "@/lib/auth-middleware";
 
 // GET /api/zones/[id] — fetch a single zone
 // Public: zone info + report count only.
-// Engineer/admin: zone info + full reports list.
+// Responder/engineer/admin: zone info + full reports list.
 export async function GET(request, { params }) {
   const doc = await adminDb.collection("zones").doc(params.id).get();
 
@@ -21,7 +21,7 @@ export async function GET(request, { params }) {
     .get();
 
   const user = await verifyAuth(request);
-  const isStaff = user?.role === "engineer" || user?.role === "admin";
+  const isStaff = user?.role === "engineer" || user?.role === "admin" || user?.role === "responder";
 
   if (isStaff) {
     const reports = reportsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -36,7 +36,7 @@ export async function GET(request, { params }) {
     );
   }
 
-  // public/citizen: no individual report details
+  // public: no individual report details
   return new Response(
     JSON.stringify({
       id: doc.id,

@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import ReportCard from "./ReportCard";
 
-export default function MyReportsList({ isEngineer }) {
+export default function MyReportsList({ isEngineer, showReviewButton }) {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -43,7 +43,7 @@ export default function MyReportsList({ isEngineer }) {
         <ReportCard
           key={report.id}
           report={report}
-          showReviewButton={isEngineer}
+          showReviewButton={showReviewButton}
         />
       ))}
     </div>

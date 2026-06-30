@@ -1,7 +1,9 @@
 import { adminAuth, adminDb } from "@/lib/firebase-admin";
 import { verifyAuth, unauthorized } from "@/lib/auth-middleware";
 
-// POST /api/admin — create an engineer account (admin only)
+const VALID_ROLES = ["public", "responder", "engineer", "admin"];
+
+// POST /api/admin — create an account (admin only)
 export async function POST(request) {
   const user = await verifyAuth(request);
   if (!user) return unauthorized();
@@ -14,7 +16,7 @@ export async function POST(request) {
   }
 
   const body = await request.json();
-  const { email, password, displayName } = body;
+  const { email, password, displayName, role = "engineer" } = body;
 
   if (!email || !password) {
     return new Response(
@@ -26,29 +28,36 @@ export async function POST(request) {
     );
   }
 
+  if (!VALID_ROLES.includes(role)) {
+    return new Response(JSON.stringify({ error: "Invalid role" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   const newUser = await adminAuth.createUser({
     email,
     password,
     displayName: displayName ?? "",
   });
 
-  // Set engineer role as custom claim
-  await adminAuth.setCustomUserClaims(newUser.uid, { role: "engineer" });
+  await adminAuth.setCustomUserClaims(newUser.uid, { role });
 
   // Create user profile in Firestore
   await adminDb
     .collection("users")
     .doc(newUser.uid)
     .set({
+      uid: newUser.uid,
       email,
       displayName: displayName ?? "",
-      role: "engineer",
+      role,
       createdAt: new Date().toISOString(),
       createdBy: user.uid,
     });
 
   return new Response(
-    JSON.stringify({ uid: newUser.uid, email, role: "engineer" }),
+    JSON.stringify({ uid: newUser.uid, email, role }),
     {
       status: 201,
       headers: { "Content-Type": "application/json" },

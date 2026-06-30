@@ -1,10 +1,11 @@
-import { adminAuth, adminDb } from "@/lib/firebase-admin";
 import { verifyCallerRole } from "@/lib/verify-admin";
+import { createUserAccount } from "@/lib/admin-account";
 
 /**
  * POST /api/admin/create-engineer
  * Body: { email: string, password: string }
  *
+ * Compatibility wrapper around the canonical create-user flow.
  * Creates a Firebase Auth account and a matching Firestore users/{uid}
  * profile with role: "engineer". Admin-only.
  */
@@ -37,36 +38,16 @@ export async function POST(request) {
     );
   }
 
-  let userRecord;
   try {
-    userRecord = await adminAuth.createUser({ email, password });
-  } catch (err) {
-    const status = err.code === "auth/email-already-exists" ? 409 : 500;
-    return Response.json(
-      { error: err.message ?? "Failed to create account" },
-      { status },
-    );
-  }
-
-  const now = new Date().toISOString();
-
-  try {
-    await adminDb.collection("users").doc(userRecord.uid).set({
-      uid: userRecord.uid,
+    const result = await createUserAccount({
       email,
+      password,
       role: "engineer",
-      createdAt: now,
     });
-  } catch (err) {
-    await adminAuth.deleteUser(userRecord.uid).catch(() => {});
-    return Response.json(
-      { error: "Failed to create user profile, account creation rolled back" },
-      { status: 500 },
-    );
-  }
 
-  return Response.json(
-    { uid: userRecord.uid, email, role: "engineer" },
-    { status: 201 },
-  );
+    return Response.json(result, { status: 201 });
+  } catch (err) {
+    const status = err.code === "auth/email-already-exists" ? 409 : err.status ?? 500;
+    return Response.json({ error: err.message ?? "Failed to create account" }, { status });
+  }
 }
