@@ -33,7 +33,6 @@ const PLACARD_STYLES = {
 export default function ReportSubmission() {
   const { status } = useAuthGuard(["public", "engineer", "admin", "responder"]);
   const router = useRouter();
-
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [location, setLocation] = useState(null);
@@ -48,6 +47,9 @@ export default function ReportSubmission() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+  function formatLabel(value) {
+    return value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  }
 
   useEffect(() => {
     getNcrCities()
@@ -218,13 +220,13 @@ export default function ReportSubmission() {
           <div
             className={`w-full rounded-full py-2 font-bold text-md ${placardColor} text-center`}
           >
-            {aiAssessment.suggestedPlacard.replace("_", " ").toUpperCase()}
+            {formatLabel(aiAssessment.suggestedPlacard)}
           </div>
 
           <div className="w-full text-left rounded-2xl border border-[#D4E1EE] p-4 flex flex-col gap-2 text-sm my-3">
             <div>
               <span className="font-semibold">Damage: </span>
-              {aiAssessment.damageClassification}
+              {formatLabel(aiAssessment.damageClassification)}
             </div>
             <div>
               <span className="font-semibold">Severity: </span>
@@ -240,7 +242,7 @@ export default function ReportSubmission() {
             </div>
             <div>
               <span className="font-semibold">Recommended Action: </span>
-              {aiAssessment.recommendedAction}
+              {formatLabel(aiAssessment.recommendedAction)}
             </div>
           </div>
 
