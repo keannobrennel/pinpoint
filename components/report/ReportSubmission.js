@@ -1,19 +1,23 @@
 "use client";
 
 import { useAuthGuard } from "@/lib/use-auth-guard";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { getNcrCities, getBarangaysForCity } from "@/lib/psgc";
 import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
 import imageCompression from "browser-image-compression";
 import "@/styles/report/report.css";
-import { getNcrCities, getBarangaysForCity } from "@/lib/psgc";
 
-// Same key BottomNav writes to before navigating here.
 const PENDING_PHOTO_KEY = "pendingReportPhoto";
 
-// Turns the base64 dataUrl handed off via sessionStorage back into a real
-// File object, so the rest of this component (which expects a File/Blob)
-// doesn't need to know the photo came from the nav bar's camera capture.
+const METRO_MANILA_CENTER = { lat: 14.5995, lng: 120.9842 };
+
+const PLACARD_STYLES = {
+  inspected: "bg-green-50 text-green-700",
+  restricted_use: "bg-orange-50 text-orange-600",
+  unsafe: "bg-red-50 text-red-700",
+};
+
 function dataUrlToFile(dataUrl, mimeType, filename = "hazard-photo.jpg") {
   const base64 = dataUrl.split(",")[1];
   const binary = atob(base64);
@@ -22,61 +26,216 @@ function dataUrlToFile(dataUrl, mimeType, filename = "hazard-photo.jpg") {
   return new File([bytes], filename, { type: mimeType });
 }
 
-// Placard styling — background/text colors for the pill, matching the
-// "RESTRICTED USE" orange treatment in the mockup.
-const PLACARD_STYLES = {
-  inspected: "bg-green-50 text-green-700",
-  restricted_use: "bg-orange-50 text-orange-600",
-  unsafe: "bg-red-50 text-red-700",
-};
+function formatLabel(value) {
+  return value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+// Normalizes city names for matching between Google's reverse geocoder
+// ("Makati City") and PSGC's naming conventions ("City of Makati", etc).
+function normalizeCityName(name) {
+  return name
+    .toLowerCase()
+    .replace(/^city of\s+/, "")
+    .replace(/\s+city$/, "")
+    .trim();
+}
+
+async function reverseGeocode(lat, lng) {
+  const geocoder = new window.google.maps.Geocoder();
+  const result = await geocoder.geocode({ location: { lat, lng } });
+  const components = result.results[0]?.address_components ?? [];
+
+  let city = null;
+
+  for (const c of components) {
+    if (
+      c.types.includes("locality") ||
+      c.types.includes("administrative_area_level_2")
+    ) {
+      city = city ?? c.long_name;
+    }
+  }
+
+  return { city };
+}
 
 export default function ReportSubmission() {
   const { status } = useAuthGuard(["public", "engineer", "admin", "responder"]);
   const router = useRouter();
+
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [location, setLocation] = useState(null);
-  const [locationError, setLocationError] = useState(null);
+  const [city, setCity] = useState(null);
+  const [barangay, setBarangay] = useState(null);
+  const [locationLabel, setLocationLabel] = useState("");
   const [description, setDescription] = useState("");
-  const [cities, setCities] = useState([]);
-  const [selectedCity, setSelectedCity] = useState("");
-  const [barangays, setBarangays] = useState([]);
-  const [selectedBarangay, setSelectedBarangay] = useState("");
-  const [locationDataLoading, setLocationDataLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const fileInputRef = useRef(null);
-  function formatLabel(value) {
-    return value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  }
+  const [mapReady, setMapReady] = useState(false);
+  const [geocoding, setGeocoding] = useState(false);
 
+  const fileInputRef = useRef(null);
+  const mapRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  const markerRef = useRef(null);
+  const searchInputRef = useRef(null);
+  const autocompleteRef = useRef(null);
+
+  const [ncrCities, setNcrCities] = useState([]);
+  const [barangayOptions, setBarangayOptions] = useState([]);
+  const [selectedCityCode, setSelectedCityCode] = useState(null);
+  const [barangayLoading, setBarangayLoading] = useState(false);
+
+  // load NCR cities once on mount
   useEffect(() => {
-    getNcrCities()
-      .then(setCities)
-      .catch((err) => console.error("Failed to load cities", err))
-      .finally(() => setLocationDataLoading(false));
+    getNcrCities().then(setNcrCities).catch(console.error);
   }, []);
 
+  // when reverse-geocoded city changes, try to auto-match a PSGC city
   useEffect(() => {
-    if (!selectedCity) {
-      setBarangays([]);
-      setSelectedBarangay("");
+    if (!city || ncrCities.length === 0) {
+      setSelectedCityCode(null);
+      setBarangayOptions([]);
       return;
     }
-    getBarangaysForCity(selectedCity)
-      .then(setBarangays)
-      .catch((err) => console.error("Failed to load barangays", err));
-    setSelectedBarangay("");
-  }, [selectedCity]);
 
-  // Pick up a photo handed off by the BottomNav camera FAB, if there is one.
+    const target = normalizeCityName(city);
+    const match = ncrCities.find((c) => normalizeCityName(c.name) === target);
+
+    if (match) {
+      setSelectedCityCode(match.code);
+    } else {
+      setSelectedCityCode(null);
+      setBarangayOptions([]);
+    }
+  }, [city, ncrCities]);
+
+  // when selectedCityCode changes, fetch barangays for it
+  useEffect(() => {
+    if (!selectedCityCode) return;
+    setBarangayLoading(true);
+    getBarangaysForCity(selectedCityCode)
+      .then(setBarangayOptions)
+      .catch(console.error)
+      .finally(() => setBarangayLoading(false));
+  }, [selectedCityCode]);
+
+  // Load Google Maps
+  useEffect(() => {
+    if (window.google?.maps) {
+      setMapReady(true);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&loading=async`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => setMapReady(true);
+    script.onerror = () => console.error("Failed to load Google Maps");
+    document.head.appendChild(script);
+  }, []);
+
+  const updatePinLocation = useCallback(async (lat, lng) => {
+    setGeocoding(true);
+    setLocation({ lat, lng });
+    setBarangay(null); // reset — user must reselect for new pin
+
+    try {
+      const { city: c } = await reverseGeocode(lat, lng);
+      setCity(c);
+      setLocationLabel(c ?? "");
+    } catch {
+      setCity(null);
+      setLocationLabel(`${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+    } finally {
+      setGeocoding(false);
+    }
+  }, []);
+
+  // Init map once Maps is loaded, the div is mounted, and auth is ready
+  useEffect(() => {
+    if (status !== "ready" || !mapReady || !mapRef.current) return;
+
+    const map = new window.google.maps.Map(mapRef.current, {
+      center: METRO_MANILA_CENTER,
+      zoom: 12,
+      disableDefaultUI: true,
+      zoomControl: true,
+      restriction: {
+        latLngBounds: {
+          north: 14.8,
+          south: 14.3,
+          east: 121.2,
+          west: 120.7,
+        },
+        strictBounds: false,
+      },
+    });
+
+    const marker = new window.google.maps.Marker({
+      map,
+      draggable: true,
+      visible: false,
+    });
+
+    marker.addListener("dragend", () => {
+      const pos = marker.getPosition();
+      updatePinLocation(pos.lat(), pos.lng());
+    });
+
+    map.addListener("click", (e) => {
+      const lat = e.latLng.lat();
+      const lng = e.latLng.lng();
+      marker.setPosition({ lat, lng });
+      marker.setVisible(true);
+      updatePinLocation(lat, lng);
+    });
+
+    mapInstanceRef.current = map;
+    markerRef.current = marker;
+
+    // Autocomplete restricted to Metro Manila
+    if (searchInputRef.current) {
+      const autocomplete = new window.google.maps.places.Autocomplete(
+        searchInputRef.current,
+        {
+          componentRestrictions: { country: "ph" },
+          bounds: new window.google.maps.LatLngBounds(
+            { lat: 14.3, lng: 120.7 },
+            { lat: 14.8, lng: 121.2 },
+          ),
+          strictBounds: true,
+          fields: ["geometry", "name", "formatted_address"],
+        },
+      );
+
+      autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+        if (!place.geometry?.location) return;
+
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+
+        map.panTo({ lat, lng });
+        map.setZoom(16);
+        marker.setPosition({ lat, lng });
+        marker.setVisible(true);
+        updatePinLocation(lat, lng);
+      });
+
+      autocompleteRef.current = autocomplete;
+    }
+  }, [status, mapReady, updatePinLocation]);
+
+  // Pick up photo handed off by BottomNav camera FAB
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(PENDING_PHOTO_KEY);
       if (!raw) return;
       sessionStorage.removeItem(PENDING_PHOTO_KEY);
-
       const { dataUrl, mimeType } = JSON.parse(raw);
       const file = dataUrlToFile(dataUrl, mimeType);
       setImage(file);
@@ -86,50 +245,47 @@ export default function ReportSubmission() {
     }
   }, []);
 
-  if (status !== "ready") return null;
+  if (status !== "ready") {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center">
+        <p className="text-gray-400 text-sm">Loading...</p>
+      </div>
+    );
+  }
 
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     if (file.size > 20 * 1024 * 1024) {
       setError("Image must be under 20MB.");
       return;
     }
-
     const compressed = await imageCompression(file, {
       maxSizeMB: 1,
       maxWidthOrHeight: 1280,
       useWebWorker: true,
     });
-
     setImage(compressed);
     setPreview(URL.createObjectURL(compressed));
   };
 
-  const getLocation = () => {
-    setLocationError(null);
-    if (!navigator.geolocation) {
-      setLocationError("Geolocation is not supported by your browser.");
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-      },
-      () => {
-        setLocationError(
-          "Unable to retrieve your location. Please allow location access.",
-        );
-      },
-    );
+  const handleUseMyLocation = () => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      mapInstanceRef.current?.panTo({ lat, lng });
+      mapInstanceRef.current?.setZoom(17);
+      markerRef.current?.setPosition({ lat, lng });
+      markerRef.current?.setVisible(true);
+      updatePinLocation(lat, lng);
+    });
   };
 
   const handleSubmit = async () => {
     if (!image) return setError("Please select a photo.");
-    if (!location) return setError("Please get your location first.");
-    if (!selectedCity) return setError("Please select your city.");
-    if (!selectedBarangay) return setError("Please select your barangay.");
+    if (!location) return setError("Please pin your location on the map.");
+    if (!barangay) return setError("Please select your barangay.");
     setLoading(true);
     setError(null);
     setResult(null);
@@ -139,6 +295,7 @@ export default function ReportSubmission() {
       const base64Data = base64.split(",")[1];
       const mimeType = image.type;
       const token = await auth.currentUser.getIdToken();
+
       const res = await fetch("/api/reports", {
         method: "POST",
         headers: {
@@ -149,9 +306,8 @@ export default function ReportSubmission() {
           base64Image: base64Data,
           mimeType,
           location,
-          city: cities.find((c) => c.code === selectedCity)?.name ?? null,
-          barangay:
-            barangays.find((b) => b.code === selectedBarangay)?.name ?? null,
+          city,
+          barangay,
           description,
         }),
       });
@@ -164,10 +320,27 @@ export default function ReportSubmission() {
       }
     } catch (err) {
       console.error("[handleSubmit] error:", err);
-
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const resetForm = () => {
+    setResult(null);
+    setImage(null);
+    setPreview(null);
+    setLocation(null);
+    setCity(null);
+    setBarangay(null);
+    setLocationLabel("");
+    setDescription("");
+    setSelectedCityCode(null);
+    setBarangayOptions([]);
+    if (markerRef.current) markerRef.current.setVisible(false);
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.panTo(METRO_MANILA_CENTER);
+      mapInstanceRef.current.setZoom(12);
     }
   };
 
@@ -195,16 +368,14 @@ export default function ReportSubmission() {
     return (
       <div className="report-shell">
         <div className="report-content">
-          {/* Mascot */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <div className="flex flex-col items-center gap-1 text-center mb-5 mt-10">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/chick3.png"
               alt=""
               aria-hidden="true"
               className="h-40 object-contain"
             />
-
             <h2 className="text-2xl font-extrabold text-[#01277C]">
               Report Submitted🎉
             </h2>
@@ -251,6 +422,7 @@ export default function ReportSubmission() {
             an official verdict for your zone.
           </p>
         </div>
+
         <div className="submit-button">
           <button
             onClick={() => router.back()}
@@ -259,13 +431,7 @@ export default function ReportSubmission() {
             Back to Home
           </button>
           <button
-            onClick={() => {
-              setResult(null);
-              setImage(null);
-              setPreview(null);
-              setLocation(null);
-              setDescription("");
-            }}
+            onClick={resetForm}
             className="w-full py-4 mt-3 rounded-xl border border-[#3474FD] text-[#3474FD] text-md font-medium"
           >
             Submit another report
@@ -277,7 +443,7 @@ export default function ReportSubmission() {
 
   return (
     <div className="report-shell">
-      <div className="report-content">
+      <div className="report-content pb-28">
         {/* Header */}
         <button
           type="button"
@@ -294,7 +460,6 @@ export default function ReportSubmission() {
         {/* Photo */}
         <div className="flex flex-col gap-2 mb-5">
           <h3 className="text-xl font-bold text-[#01277C]">Captured Photo</h3>
-
           {preview ? (
             <div className="flex gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -315,76 +480,95 @@ export default function ReportSubmission() {
           ) : (
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed rounded-xl h-48 flex items-center justify-center cursor-pointer overflow-hidden"
+              className="border-2 border-dashed rounded-xl h-48 flex items-center justify-center cursor-pointer"
             >
               <span className="text-sm text-gray-400">
                 Tap to select or take a photo
               </span>
             </div>
           )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="hidden"
+            onChange={handleImageChange}
+          />
         </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          className="hidden"
-          onChange={handleImageChange}
-        />
 
-        {/* Location */}
+        {/* Map + Location */}
         <div className="flex flex-col gap-2 mb-5">
-          <h3 className="text-xl font-bold text-[#01277C]">Pin a location</h3>
-          <div className="space-y-1">
-            <button
-              onClick={getLocation}
-              className="w-full py-2 rounded-lg bg-gray-100 text-sm font-medium"
-            >
-              {location
-                ? `Location captured (${location.lat.toFixed(4)}, ${location.lng.toFixed(4)})`
-                : "Get My Location"}
-            </button>
-            {locationError && (
-              <p className="text-xs text-red-500">{locationError}</p>
-            )}
+          <h3 className="text-xl font-bold text-[#01277C]">Pin a Location</h3>
+
+          {/* Search input */}
+          <div className="relative">
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder="Search a place in Metro Manila..."
+              className="w-full py-3 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
           </div>
-        </div>
 
-        {/* City & Barangay */}
-        <div className="flex flex-col gap-2 mb-5">
-          <h3 className="text-xl font-bold text-[#01277C]">Location Area</h3>
+          {/* Map */}
+          <div
+            ref={mapRef}
+            className="w-full rounded-xl overflow-hidden border border-gray-200"
+            style={{ height: "240px" }}
+          />
 
-          <select
-            value={selectedCity}
-            onChange={(e) => setSelectedCity(e.target.value)}
-            disabled={locationDataLoading}
-            className="w-full py-3 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          {/* Use my location button */}
+          <button
+            type="button"
+            onClick={handleUseMyLocation}
+            className="flex items-center justify-center gap-2 w-full py-2 rounded-lg bg-gray-100 text-sm font-medium text-gray-700"
           >
-            <option value="">
-              {locationDataLoading ? "Loading cities..." : "Select city"}
-            </option>
-            {cities.map((city) => (
-              <option key={city.code} value={city.code}>
-                {city.name}
-              </option>
-            ))}
-          </select>
+            <i
+              className="fa-solid fa-location-crosshairs text-blue-500"
+              aria-hidden="true"
+            />
+            Use my current location
+          </button>
 
-          <select
-            value={selectedBarangay}
-            onChange={(e) => setSelectedBarangay(e.target.value)}
-            disabled={!selectedCity || barangays.length === 0}
-            className="w-full py-3 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
-          >
-            <option value="">
-              {selectedCity ? "Select barangay" : "Select a city first"}
-            </option>
-            {barangays.map((b) => (
-              <option key={b.code} value={b.code}>
-                {b.name}
-              </option>
-            ))}
-          </select>
+          {/* Location label */}
+          {geocoding && (
+            <p className="text-xs text-gray-400">Getting location details...</p>
+          )}
+          {locationLabel && !geocoding && (
+            <p className="text-xs text-gray-600 font-medium">
+              📍 {locationLabel}
+            </p>
+          )}
+
+          {/* Barangay select — only shown once we have a pinned location */}
+          {location && !geocoding && (
+            <div className="flex flex-col gap-1">
+              {barangayLoading ? (
+                <p className="text-xs text-gray-400">Loading barangays...</p>
+              ) : barangayOptions.length > 0 ? (
+                <select
+                  value={barangay ?? ""}
+                  onChange={(e) => setBarangay(e.target.value)}
+                  className="w-full py-2.5 px-3 rounded-lg border border-gray-200 text-sm bg-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                  <option value="" disabled>
+                    Select barangay
+                  </option>
+                  {barangayOptions.map((b) => (
+                    <option key={b.code} value={b.name}>
+                      {b.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <p className="text-xs text-orange-500">
+                  Couldn&apos;t auto-match barangay list for this city. Please
+                  pin a location within a recognized NCR city.
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Description */}
@@ -396,25 +580,13 @@ export default function ReportSubmission() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Optional: describe what you see"
-            className="
-              w-full
-              box-border
-              rounded-xl
-              border border-gray-200
-              bg-gray-50
-              px-4 py-3
-              text-sm
-              focus:border-blue-500
-              focus:outline-none
-              focus:ring-inset
-              focus:ring-1
-              focus:ring-blue-500
-            "
+            className="w-full box-border rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-inset focus:ring-1 focus:ring-blue-500"
           />
         </div>
 
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
       </div>
+
       <button
         onClick={handleSubmit}
         disabled={loading}
