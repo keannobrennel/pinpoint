@@ -5,13 +5,14 @@
 
 /* ── Tokens ──────────────────────────────────────────────── */
 :root {
-  --pp-navy:        #01277C;   /* primary text / active nav */
-  --pp-orange:      #F97316;   /* CTA / badge / active accent */
-  --pp-orange-dark: #d96b10;   /* hover / pressed */
+  --pp-navy:        #01277C;  
+  --pp-main:        #2563EB;
+  --pp-orange:      #F97316;  
+  --pp-orange-dark: #d96b10;  
   --pp-white:       #ffffff;
-  --pp-bg:          #eef2fb;   /* light blue-grey app bg */
+  --pp-bg:          #eef2fb;  
   --pp-surface:     #ffffff;
-  --pp-muted:       #7a8aab;   /* inactive nav labels */
+  --pp-muted:       #7a8aab;  
   --pp-border:      #d9e2f3;
 
   --pp-font:        "Plus Jakarta Sans";
@@ -31,11 +32,9 @@
 .app-content {
   flex: 1;
   overflow-y: auto;
-  width: 87%;
+  width: 100%;
   height: 100%;
-  /* No padding-top here — each page owns its own top spacing,
-     since Home uses a fixed Header (needs clearance) while
-     Alerts/Reports use in-flow headers (don't). */
+  padding: 0 25px;
 }
 
 /* ── Header ─────────────────────────────────────────────── */
@@ -114,6 +113,9 @@
   background: var(--pp-orange);
 }
 
+
+
+
 /* ── Bottom Nav ─────────────────────────────────────────── */
 .bottom-nav {
   position: fixed;
@@ -126,7 +128,7 @@
   left: 0;
   z-index: 100;
   height: 8%;
-  gap: 17;
+  gap: 13;
 }
 
 .bottom-nav__list {
@@ -171,12 +173,12 @@
 }
 
 .bottom-nav__icon-wrap i {
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1;
 }
 
 .bottom-nav__label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   line-height: 1;
 }
@@ -201,9 +203,12 @@
   border: 2px solid var(--pp-white);
 }
 
+
+
+
 /* ── FAB (floating camera button) ───────────────────────── */
 .fab-camera {
-  width: 65px;
+  width: 60px;
   aspect-ratio: 1/1;
   border-radius: 50%;
   background: linear-gradient(135deg, #3474FF, #1E51A9);
@@ -226,6 +231,9 @@
   font-size: 27px;
 }
 
+
+
+
 /* ── Loading state ───────────────────────────────────────── */
 .screen-loading {
   display: flex;
@@ -235,4 +243,101 @@
   font-family: var(--pp-font);
   color: var(--pp-muted);
   font-size: 14px;
+}
+
+
+
+
+/* ── List Screen Shell ───────────────────────────────────── */
+/* Used by Community, Reports, Incidents pages */
+
+.list-screen {
+  display: flex;
+  flex-direction: column;
+  padding-top: 40px;
+  gap: 12px;
+  height: 100%;
+}
+
+.list-screen__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.list-screen__title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.list-screen__title {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--pp-main);
+  line-height: 1.1;
+}
+
+.list-screen__subtitle {
+  font-size: 12px;
+  color: var(--pp-muted);
+  font-weight: 400;
+}
+
+.list-screen__filter-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1.5px solid var(--pp-border);
+  background: var(--pp-white);
+  color: var(--pp-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.list-screen__filter-btn i {
+  font-size: 16px;
+}
+
+.list-screen__content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 100px; /* clearance for fixed bottom nav */
+}
+
+
+
+
+/* ── Filter Bar ──────────────────────────────────────────── */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-bar__pill {
+  padding: 6px 14px;
+  border-radius: 50px;
+  border: 1.5px solid var(--pp-border);
+  background: var(--pp-white);
+  color: var(--pp-muted);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--pp-font);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.filter-bar__pill--active {
+  background: var(--pp-navy);
+  color: var(--pp-white);
+  border-color: var(--pp-navy);
 }
