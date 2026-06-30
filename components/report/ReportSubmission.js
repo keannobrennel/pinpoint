@@ -335,7 +335,8 @@ export default function ReportUpload() {
               focus:ring-inset
               focus:ring-1
               focus:ring-blue-500
-            "/>        
+            "
+            />        
         </div>
 
 

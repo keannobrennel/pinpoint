@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import AlertsHeader from "@/components/alerts/AlertsHeader";
+import AlertsTabs from "@/components/alerts/AlertsTabs";
 import AlertCard from "@/components/alerts/AlertCard";
 
 export default function AlertsPage() {
@@ -45,40 +46,33 @@ export default function AlertsPage() {
   });
 
   const activeCount = allAlerts.filter((a) => a.status !== "resolved").length;
+  const resolvedCount = allAlerts.filter((a) => a.status === "resolved").length;
 
   return (
-    <div className="alerts-page">
-      <AlertsHeader onFilterClick={() => { /* TODO: open filter sheet */ }} />
-
-      <input
-        type="text"
-        placeholder="Search for location, severity, date..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="alerts-search"
+    <div className="min-h-screen">
+      <AlertsHeader
+        onFilterClick={() => {
+          /* TODO: open filter sheet */
+        }}
+        search={search}
+        onSearchChange={setSearch}
       />
 
-      <div className="alerts-tabs">
-        <button
-          className={activeTab === "active" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("active")}
-        >
-          Active ({activeCount})
-        </button>
-        <button
-          className={activeTab === "resolved" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("resolved")}
-        >
-          Resolved
-        </button>
-      </div>
+      <AlertsTabs
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        activeCount={activeCount}
+        resolvedCount={resolvedCount}
+      />
 
-      <div className="alerts-list">
+      <div className="py-4 flex flex-col gap-3">
         {filteredAlerts.map((alert) => (
           <AlertCard key={alert.id} alert={alert} />
         ))}
         {filteredAlerts.length === 0 && (
-          <p className="empty-state">No alerts to show.</p>
+          <p className="text-center text-sm text-[#7a8aab] mt-10">
+            No alerts to show.
+          </p>
         )}
       </div>
     </div>
