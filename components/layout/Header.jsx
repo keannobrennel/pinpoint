@@ -11,8 +11,8 @@ export default function Header() {
         <Image
             src="/pinpoint-logo-pin.png"
             alt="PinPoint pin icon"
-            width={54}
-            height={54}
+            width={48}
+            height={48}
             priority
             className="logo-pin"
         />
