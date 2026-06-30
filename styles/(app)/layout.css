@@ -1,0 +1,235 @@
+/* styles/layout.css
+   Design tokens + Header + BottomNav styles for PinPoint.
+   Import once in your global CSS / globals.css.
+*/
+
+/* ── Tokens ──────────────────────────────────────────────── */
+:root {
+  --pp-navy:        #01277C;   /* primary text / active nav */
+  --pp-orange:      #F97316;   /* CTA / badge / active accent */
+  --pp-orange-dark: #d96b10;   /* hover / pressed */
+  --pp-white:       #ffffff;
+  --pp-bg:          #eef2fb;   /* light blue-grey app bg */
+  --pp-surface:     #ffffff;
+  --pp-muted:       #7a8aab;   /* inactive nav labels */
+  --pp-border:      #d9e2f3;
+
+  --pp-font:        "Plus Jakarta Sans";
+}
+
+/* ── App shell ───────────────────────────────────────────── */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100dvh;
+  background: var(--pp-bg);
+  font-family: var(--pp-font);
+}
+
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  width: 87%;
+  height: 100%;
+  /* No padding-top here — each page owns its own top spacing,
+     since Home uses a fixed Header (needs clearance) while
+     Alerts/Reports use in-flow headers (don't). */
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.pinpoint-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 25px 25px 25px;
+}
+
+/* Logo group */
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-pin {
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.logo-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.logo-text {
+  object-fit: contain;
+  margin-bottom: 3;
+}
+
+.logo-tagline {
+  font-size: 10px;
+  color: var(--pp-muted);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  margin-left: 3;
+}
+
+/* Avatar button */
+.header-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  background: var(--pp-orange);
+  flex-shrink: 0;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--pp-navy);
+  background: var(--pp-orange);
+}
+
+/* ── Bottom Nav ─────────────────────────────────────────── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  margin: 20 25 20 25;
+  width: 87%;
+  z-index: 100;
+  height: 8%;
+  gap: 17;
+}
+
+.bottom-nav__list {
+  display: flex;
+  flex: 1;
+  align-items: stretch;
+  height: 100%;
+  padding: 2;
+  list-style: none;
+  background: var(--pp-white);
+  box-shadow: 0 4px 16px rgba(26, 43, 94, 0.15);
+  transition: background 0.15s, transform 0.15s;
+  border-radius: 50;
+}
+
+.bottom-nav__item {
+  flex: 1;
+}
+
+.bottom-nav__link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 100%;
+  text-decoration: none;
+  color: var(--pp-muted);
+  transition: color 0.15s;
+}
+
+.bottom-nav__link--active {
+  color: #2457C5;
+}
+
+.bottom-nav__icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+}
+
+.bottom-nav__icon-wrap i {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.bottom-nav__label {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* Alert badge */
+.bottom-nav__badge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: var(--pp-orange);
+  color: var(--pp-white);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border: 2px solid var(--pp-white);
+}
+
+/* ── FAB (floating camera button) ───────────────────────── */
+.fab-camera {
+  width: 71px;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1E51A9, #3474FF);
+  color: var(--pp-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(26, 43, 94, 0.35);
+  transition: filter 0.15s, transform 0.15s;
+}
+
+.fab-camera:hover,
+.fab-camera:focus-visible {
+  background: var(--pp-orange);
+  transform: scale(1.06);
+  outline: none;
+}
+
+.fab-camera i {
+  font-size: 27px;
+}
+
+/* ── Loading state ───────────────────────────────────────── */
+.screen-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100dvh;
+  font-family: var(--pp-font);
+  color: var(--pp-muted);
+  font-size: 14px;
+}

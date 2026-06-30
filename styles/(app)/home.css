@@ -1,0 +1,18 @@
+:root {
+  --pp-navy:        #01277C;   /* primary text / active nav */
+  --pp-orange:      #F97316;   /* CTA / badge / active accent */
+  --pp-orange-dark: #d96b10;   /* hover / pressed */
+  --pp-white:       #ffffff;
+  --pp-bg:          #eef2fb;   /* light blue-grey app bg */
+  --pp-surface:     #ffffff;
+  --pp-muted:       #7a8aab;   /* inactive nav labels */
+  --pp-border:      #d9e2f3;
+
+  --pp-font:        "Plus Jakarta Sans";
+
+  --header-h:       125px;
+}
+
+.home-page {
+  padding-top: var(--header-h);
+}
