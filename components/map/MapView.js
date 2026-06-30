@@ -9,7 +9,13 @@
  * - Mounts the public heatmap layer (always visible)
  * - Conditionally mounts the engineer pin layer (isEngineer === true only)
  * - Mounts DisasterZoneBanner (visible to all users when disaster zones exist)
- * - Manages selectedZone state and mounts ZoneInfoPanel
+ * - Mounts ZoneLegend (bottom-right safe/caution/dangerous key)
+ * - Manages selectedZone state and mounts ZoneDetailDialog
+ *
+ * selectedZone can now be opened from TWO places:
+ * 1. Tapping an engineer-only AdvancedMarker pin (ZoneMarkers.js)
+ * 2. Tapping a heatmap blob directly (Heatmap.js onBlobClick — public-visible)
+ * Both call the same handleZoneSelect handler so they open the same dialog.
  *
  * This is a CLIENT component. The `google` global is only available after
  * APIProvider has injected the Maps SDK script — all child components that
@@ -27,7 +33,8 @@ import { useState, useCallback } from 'react';
 import { APIProvider, Map } from '@vis.gl/react-google-maps';
 import Heatmap from './Heatmap';
 import ZoneMarkers from './ZoneMarkers';
-import ZoneInfoPanel from './ZoneInfoPanel';
+import ZoneDetailDialog from './ZoneDetailDialog';
+import ZoneLegend from './ZoneLegend';
 import DisasterZoneBanner from './DisasterZoneBanner';
 
 // Public Maps key — safe to expose in the browser bundle.
@@ -39,18 +46,13 @@ const MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 // Create one at: Cloud Console → Maps Management → Create Map ID
 const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID;
 
-/**
- * Subtle map style — reduces visual noise (POI icons, transit labels, road
- * icons) so the heatmap layer reads clearly without competing elements.
- * The design teammate can extend this if they want a dark-mode or custom
- * base map later.
- */
+// NOTE: `styles` is intentionally NOT passed to <Map> below — Google Maps
+// ignores the styles prop whenever a mapId is present (style is controlled
+// via Cloud Console instead once a Map ID is set). Keeping MAP_STYLES here
+// as reference only, in case mapId is ever removed during local testing.
 const MAP_STYLES = [
-  // Hide all POI labels (restaurants, shops, etc.) — they clutter the heatmap area
   { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
-  // Hide transit labels (bus stops, train stations) — not relevant to hazard context
   { featureType: 'transit', elementType: 'labels', stylers: [{ visibility: 'off' }] },
-  // Hide road icon labels (speed cameras, etc.) — reduces clutter
   { featureType: 'road', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
 ];
 
@@ -67,8 +69,8 @@ const MAP_STYLES = [
 export default function MapView({ zones, userLocation, defaultZoom, isEngineer }) {
   /**
    * selectedZone: the zone object the user last tapped on (or null).
-   * State lives here (not in page.js) because only MapView and its children
-   * need it. Avoids unnecessary re-renders of the parent page component.
+   * Shared between pin clicks (ZoneMarkers, engineer-only) and blob clicks
+   * (Heatmap, public-visible) — both funnel into the same dialog.
    */
   const [selectedZone, setSelectedZone] = useState(null);
 
@@ -77,9 +79,10 @@ export default function MapView({ zones, userLocation, defaultZoom, isEngineer }
   }, []);
 
   /**
-   * handleClosePanel is attached to both:
-   * 1. ZoneInfoPanel's onClose button
-   * 2. The <Map> onClick (tapping the map background dismisses the panel)
+   * handleClosePanel is attached to:
+   * 1. ZoneDetailDialog's backdrop/close button
+   * 2. The <Map> onClick (tapping the map background dismisses the dialog)
+   * 3. Heatmap's canvas click-passthrough when no blob was hit
    */
   const handleClosePanel = useCallback(() => {
     setSelectedZone(null);
@@ -90,95 +93,69 @@ export default function MapView({ zones, userLocation, defaultZoom, isEngineer }
       apiKey={MAPS_API_KEY}
       /**
        * libraries: ['visualization'] appends &libraries=visualization to the
-       * Maps SDK script URL, which is what loads HeatmapLayer support.
-       * This is separate from enabling the Visualization API in Cloud Console —
-       * BOTH are required. The Cloud Console toggle is a one-time admin step.
+       * Maps SDK script URL. Kept even though the custom canvas heatmap no
+       * longer uses HeatmapLayer, in case other visualization features are
+       * added later — harmless to leave enabled.
        */
       libraries={['visualization']}
     >
       {/*
-        position:relative wrapper — the info panel and disaster banner use
-        position:absolute relative to this container, not to the viewport.
+        position:relative wrapper — the dialog and disaster banner use
+        position:absolute/fixed relative to this container or the viewport.
         width/height:100% fills the parent (which is 100vw × 100dvh in page.js).
       */}
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
 
         {/* ── Disaster Mode Banner ─────────────────────────────────────────── */}
-        {/*
-          Rendered above the Map but inside this container.
-          Visible to all users (public + engineer) when any zone is in disaster mode.
-          The design teammate's top chrome (logo, greeting) should stack below this.
-        */}
         <DisasterZoneBanner zones={zones} />
 
         {/* ── Map Canvas ───────────────────────────────────────────────────── */}
         <Map
-          /**
-           * mapId: required for AdvancedMarker (engineer layer).
-           * Safe to be undefined for public-only sessions (heatmap still works).
-           * If mapId is missing and isEngineer=true, a console warning appears.
-           */
           mapId={MAP_ID}
           defaultCenter={userLocation}
           defaultZoom={defaultZoom}
           style={{ width: '100%', height: '100%' }}
-          /**
-           * gestureHandling: "greedy" — essential for mobile UX.
-           * Default behaviour requires two fingers to pan a map embedded in a
-           * scrollable page. This is a full-screen map app, so single-finger
-           * pan is correct. Without this, mobile users can't pan the map.
-           */
           gestureHandling="greedy"
-          /**
-           * disableDefaultUI: removes zoom controls, street view pegman,
-           * fullscreen button. Gives the design teammate a clean canvas.
-           * Google logo (bottom-left) remains — required by Maps ToS.
-           */
           disableDefaultUI={true}
-          /**
-           * clickableIcons: false — prevents Google's built-in POI info windows
-           * from opening when a user taps a restaurant or landmark.
-           * Without this, POI taps would fight with our ZoneInfoPanel.
-           */
           clickableIcons={false}
           mapTypeId="roadmap"
-          styles={MAP_STYLES}
           /**
-           * onClick on the Map background closes the info panel.
-           * AdvancedMarker onClick events do NOT bubble up to the Map,
-           * so this fires only on genuine background taps.
+           * onClick on the Map background closes the dialog.
+           * AdvancedMarker onClick events do NOT bubble up to the Map, and
+           * the heatmap canvas forwards unhandled clicks here too (see
+           * Heatmap.js handleCanvasClick), so this covers all three
+           * "tap empty space" cases.
            */
           onClick={handleClosePanel}
         >
           {/* ── Public Heatmap Layer ──────────────────────────────────────── */}
           {/*
-            Always rendered. Shows severity density to all visitors.
-            Reads from zones[].averageSeverityScore via Heatmap.js.
+            Always rendered. Shows severity-sized, verdict-colored blobs to
+            all visitors. Clicking directly on a blob opens the same dialog
+            as tapping an engineer pin (onBlobClick → handleZoneSelect).
           */}
-          <Heatmap zones={zones} />
+          <Heatmap zones={zones} onBlobClick={handleZoneSelect} />
 
           {/* ── Engineer Pin Layer ────────────────────────────────────────── */}
           {/*
             Only mounted when the logged-in user has role=engineer or role=admin.
-            Shows AdvancedMarker pins colored by officialVerdict.
-            Public visitors see only the heatmap above.
+            Public visitors never see these pins — only the heatmap blobs
+            above, which are now clickable too.
           */}
-          {isEngineer && (
-            <ZoneMarkers
-              zones={zones}
-              onZoneSelect={handleZoneSelect}
-            />
-          )}
+          
+          <ZoneMarkers zones={zones} onZoneSelect={handleZoneSelect} />
+          
         </Map>
 
-        {/* ── Zone Info Panel ───────────────────────────────────────────────── */}
+        {/* ── Legend ───────────────────────────────────────────────────────── */}
+        <ZoneLegend />
+
+        {/* ── Zone Detail Dialog ───────────────────────────────────────────── */}
         {/*
+          Centered modal (replaces the old bottom-sheet ZoneInfoPanel).
           Renders outside <Map> but inside the position:relative wrapper.
-          This is intentional — it overlays the map surface from the bottom.
-          Mounting it inside <Map> would cause Google Maps to interfere with
-          its positioning.
         */}
-        <ZoneInfoPanel
+        <ZoneDetailDialog
           zone={selectedZone}
           onClose={handleClosePanel}
         />

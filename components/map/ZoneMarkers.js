@@ -21,7 +21,7 @@
  */
 
 import { AdvancedMarker } from '@vis.gl/react-google-maps';
-import { useCallback } from 'react';
+import { useCallback, useEffect  } from 'react';
 
 /**
  * Verdict → visual config mapping.
@@ -76,7 +76,7 @@ function ZonePin({ verdict, disasterMode, reportCount }) {
             width: 40,
             height: 40,
             borderRadius: '50%',
-            background: '#ef4444',
+            background: '#f6f6f6',
             opacity: 0.35,
             animation: 'pinpoint-pulse 1.5s ease-out infinite',
             zIndex: 0,
@@ -139,6 +139,23 @@ export default function ZoneMarkers({ zones, onZoneSelect }) {
    * Stable click handler — useCallback prevents new function instances on
    * every render, which would cause AdvancedMarker to detach/reattach listeners.
    */
+  // Inject pulse keyframe into document.head — globals.css doesn't reach
+  // AdvancedMarker's isolated DOM context
+  useEffect(() => {
+    const styleId = 'pinpoint-pulse-keyframe';
+    if (document.getElementById(styleId)) return;
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+      @keyframes pinpoint-pulse {
+        0%   { transform: scale(1);   opacity: 0.35; }
+        70%  { transform: scale(2);   opacity: 0; }
+        100% { transform: scale(2);   opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  }, []);
+
   const handleClick = useCallback(
     (zone) => {
       onZoneSelect(zone);
@@ -168,7 +185,7 @@ export default function ZoneMarkers({ zones, onZoneSelect }) {
            * Disaster zones float above regular markers.
            * zIndex 100 ensures they're always visible when clusters overlap.
            */
-          zIndex={zone.disasterMode ? 100 : 1}
+          zIndex={zone.disasterMode ? 9999 : 1000}  // very high
           /**
            * title is shown as a native browser tooltip on hover (desktop).
            * Provides a minimal accessibility label without custom tooltip UI.

@@ -22,23 +22,114 @@
  * left for them below.
  */
 
+
+
 import MapView from '@/components/map/MapView';
 import { useZones } from '@/hooks/useZones';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useAuth } from '@/hooks/useAuth';
 
+
 export default function MapPage() {
   const { location, zoom } = useGeolocation();
-  const { zones, loading, error } = useZones();
   const { role } = useAuth(); // useAuth already exists — role is null/undefined when logged out
 
   const isEngineer = role === 'engineer' || role === 'admin';
+
+  // app/(public)/map/page.js — ADD this temporarily at the top of MapPage()
+
+  const { zones: realZones, loading, error } = useZones();
+
+  // TEMP TEST DATA — remove before merging
+  const testZones = [
+    {
+      id: 'test-1',
+      centerCoordinates: { lat: 14.5995, lng: 120.9842 }, // Manila
+      averageSeverityScore: 2,
+      reportCount: 1,
+      officialVerdict: 'unsafe',
+      inspectionStatus: 'inspector_dispatched',
+      alertBannerMessage: 'Building collapse reported. Avoid the area.',
+      disasterMode: true,
+    },
+    {
+      id: 'test-2',
+      centerCoordinates: { lat: 14.6090, lng: 121.0000 }, // Quezon City
+      averageSeverityScore: 5,
+      reportCount: 4,
+      officialVerdict: 'restricted_use',
+      inspectionStatus: 'pending_inspection',
+      alertBannerMessage: '',
+      disasterMode: false,
+    },
+    {
+      id: 'test-3',
+      centerCoordinates: { lat: 14.5800, lng: 120.9800 }, // Ermita
+      averageSeverityScore: 2,
+      reportCount: 1,
+      officialVerdict: 'inspected',
+      inspectionStatus: 'assessed',
+      alertBannerMessage: '',
+      disasterMode: false,
+    },
+    {
+      id: 'test-4',
+      centerCoordinates: { lat: 14.5548, lng: 121.0244 }, // Makati
+      averageSeverityScore: 7,
+      reportCount: 8,
+      officialVerdict: 'unsafe',
+      inspectionStatus: 'inspector_dispatched',
+      alertBannerMessage: 'Structural damage reported.',
+      disasterMode: true,
+    },
+    {
+      id: 'test-5',
+      centerCoordinates: { lat: 14.6507, lng: 121.0494 }, // Quezon City (Cubao)
+      averageSeverityScore: 4,
+      reportCount: 3,
+      officialVerdict: 'restricted_use',
+      inspectionStatus: 'pending_inspection',
+      alertBannerMessage: '',
+      disasterMode: false,
+    },
+    {
+      id: 'test-6',
+      centerCoordinates: { lat: 14.5200, lng: 121.0190 }, // Taguig
+      averageSeverityScore: 1,
+      reportCount: 2,
+      officialVerdict: 'inspected',
+      inspectionStatus: 'assessed',
+      alertBannerMessage: '',
+      disasterMode: false,
+    },
+    {
+      id: 'test-7',
+      centerCoordinates: { lat: 14.6760, lng: 121.0437 }, // Caloocan
+      averageSeverityScore: 6,
+      reportCount: 5,
+      officialVerdict: null,
+      inspectionStatus: 'no_assessment',
+      alertBannerMessage: '',
+      disasterMode: false,
+    },
+    {
+      id: 'test-8',
+      centerCoordinates: { lat: 14.5794, lng: 121.0359 }, // Mandaluyong
+      averageSeverityScore: 8,
+      reportCount: 15,
+      officialVerdict: 'unsafe',
+      inspectionStatus: 'assessed',
+      alertBannerMessage: 'Evacuation in progress.',
+      disasterMode: true,
+    },
+  ];
+  const zones = testZones; // swap to `realZones` when done testing
 
   return (
     <div
       style={{
         position: 'relative',
-        width: '100vw',
+        width: '90vw',
         height: '100dvh', // dvh, not vh — avoids iOS Safari chrome overlapping the map
         overflow: 'hidden',
       }}
