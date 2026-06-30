@@ -1,88 +1,66 @@
 // components/alerts/AlertsHeader.jsx
+import { useState } from "react";
 
-const styles = {
-  wrap: {
-    padding: "24px 0 16px",
-  },
-  top: {
-    display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 500,
-    color: "#01277C",
-    margin: "0 0 4px",
-    fontFamily: "'Plus Jakarta Sans', sans-serif",
-  },
-  subtext: {
-    fontSize: 12,
-    color: "#7a8aab",
-    lineHeight: 1.4,
-    margin: 0,
-    maxWidth: 220,
-  },
-  filterBtn: {
-    background: "#ffffff",
-    border: "0.5px solid #d9e2f3",
-    borderRadius: 10,
-    padding: "8px 16px",
-    fontSize: 13,
-    fontWeight: 500,
-    color: "#01277C",
-    whiteSpace: "nowrap",
-    boxShadow: "0 2px 6px rgba(26, 43, 94, 0.08)",
-    cursor: "pointer",
-  },
-  search: {
-    width: "100%",
-    marginTop: 14,
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    background: "#ffffff",
-    border: "0.5px solid #d9e2f3",
-    borderRadius: 10,
-    padding: "10px 14px",
-    boxSizing: "border-box",
-  },
-  searchInput: {
-    border: "none",
-    outline: "none",
-    fontSize: 13,
-    color: "#01277C",
-    fontFamily: "'Plus Jakarta Sans', sans-serif",
-    width: "100%",
-    background: "transparent",
-  },
-};
+export default function AlertsHeader({
+  onFilterClick,
+  search,
+  onSearchChange,
+  activeCount = 2,
+  resolvedCount = 0,
+  activeTab = "active",
+  onTabChange,
+}) {
+  const [tab, setTab] = useState(activeTab);
 
-export default function AlertsHeader({ onFilterClick, search, onSearchChange }) {
+  const handleTabClick = (key) => {
+    setTab(key);
+    onTabChange?.(key);
+  };
+
   return (
-    <div style={styles.wrap}>
-      <div style={styles.top}>
-        <div>
-          <h1 style={styles.title}>Alerts</h1>
-          <p style={styles.subtext}>
+    <div className="pt-6 pb-4">
+      {/* Title row */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-4xl font-extrabold text-[#01277C]">
+            Alerts
+          </h1>
+          <p className="text-md text-[#7a8aab] leading-snug ">
             Official updates and announcements from the engineering office
           </p>
         </div>
 
-        <button style={styles.filterBtn} onClick={onFilterClick}>
+        <button
+          onClick={onFilterClick}
+          className="bg-white border border-[#d9e2f3] rounded-xl px-4 py-2 text-sm font-medium text-[#2f5bff] whitespace-nowrap shadow-[0_2px_6px_rgba(26,43,94,0.08)] cursor-pointer hover:bg-gray-50 active:scale-[0.98] transition"
+        >
           Filter
         </button>
       </div>
 
-      <div style={styles.search}>
-        <i className="ti ti-search" style={{ fontSize: 16, color: "#7a8aab" }} />
+      {/* Search bar */}
+      <div className="mt-4">
+        <i className="ti ti-search text-base text-[#7a8aab]" />
         <input
-          type="text"
-          placeholder="Search for location, severity, date..."
-          value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
-          style={styles.searchInput}
+            type="text"
+            placeholder="Search for location, severity, date..."
+            value={search}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="
+              w-full
+              box-border
+              rounded-xl
+              bg-gray-50
+              px-4 py-4
+              text-sm
+              focus:border-blue-500
+              focus:outline-none
+              focus:ring-inset
+              focus:ring-1
+              focus:ring-blue-500
+              shadow-[0_2px_6px_rgba(26,43,94,0.08)]
+              placeholder:*:text-[#7a8aab]
+            "
         />
       </div>
     </div>

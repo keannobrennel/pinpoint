@@ -1,14 +1,27 @@
+// hooks/useAuth.js
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 
+// Reads role from Firestore (collection: "users"), not from ID token
+// custom claims. Custom claims are never set during login/signup in
+// this project — the Firestore doc is the single source of truth for role.
 export function useAuth() {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    let unsubProfile = null;
+
+    const unsubAuth = onAuthStateChanged(auth, (firebaseUser) => {
+      // Clean up any previous Firestore listener when auth state changes.
+      if (unsubProfile) {
+        unsubProfile();
+        unsubProfile = null;
+      }
+
       if (!firebaseUser) {
         setUser(null);
         setRole(null);
@@ -16,13 +29,31 @@ export function useAuth() {
         return;
       }
 
-      const tokenResult = await firebaseUser.getIdTokenResult();
       setUser(firebaseUser);
-      setRole(tokenResult.claims.role ?? "citizen");
-      setLoading(false);
+
+      const userRef = doc(db, "users", firebaseUser.uid);
+      unsubProfile = onSnapshot(
+        userRef,
+        (snap) => {
+          if (snap.exists()) {
+            setRole(snap.data().role ?? "public");
+          } else {
+            setRole("public");
+          }
+          setLoading(false);
+        },
+        (err) => {
+          console.error("[useAuth] onSnapshot error:", err);
+          setRole("public");
+          setLoading(false);
+        }
+      );
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubAuth();
+      if (unsubProfile) unsubProfile();
+    };
   }, []);
 
   return { user, role, loading };

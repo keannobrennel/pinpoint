@@ -17,14 +17,7 @@ export default function Header() {
             className="logo-pin"
         />
         <div className="logo-text-wrap">
-          <Image
-            src="/pinpoint-logo-text.png"
-            alt="PinPoint"
-            width={120}
-            height={22}
-            priority
-            className="logo-text"
-          />
+          <h1 className="logo-text">PinPoint</h1>
           <span className="logo-tagline">Flag Hazards. Drive Action</span>
         </div>
       </div>
