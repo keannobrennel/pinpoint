@@ -2,13 +2,10 @@
 "use client";
 
 import { useState } from "react";
+import AlertsHeader from "@/components/alerts/AlertsHeader";
 import AlertCard from "@/components/alerts/AlertCard";
 
 export default function AlertsPage() {
-  // Per the designs, Alerts looks identical for Residents and Engineers —
-  // no role branching needed here. If that changes later (e.g. Engineers
-  // get a "Push Alert" button), branch the same way the other pages do.
-
   const [activeTab, setActiveTab] = useState("active"); // "active" | "resolved"
   const [search, setSearch] = useState("");
 
@@ -51,13 +48,7 @@ export default function AlertsPage() {
 
   return (
     <div className="alerts-page">
-      <div className="alerts-header">
-        <h1>Alerts</h1>
-        <button className="filter-btn">Filter</button>
-      </div>
-      <p className="alerts-subtext">
-        Official updates and announcements from the engineering office
-      </p>
+      <AlertsHeader onFilterClick={() => { /* TODO: open filter sheet */ }} />
 
       <input
         type="text"

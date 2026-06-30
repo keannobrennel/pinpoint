@@ -15,10 +15,6 @@
   --pp-border:      #d9e2f3;
 
   --pp-font:        "Plus Jakarta Sans";
-
-  --header-h:       64px;
-  --bottomnav-h:    72px;
-  --fab-size:       56px;
 }
 
 /* ── App shell ───────────────────────────────────────────── */
@@ -36,8 +32,10 @@
   flex: 1;
   overflow-y: auto;
   width: 87%;
-  padding-top: 125;
   height: 100%;
+  /* No padding-top here — each page owns its own top spacing,
+     since Home uses a fixed Header (needs clearance) while
+     Alerts/Reports use in-flow headers (don't). */
 }
 
 /* ── Header ─────────────────────────────────────────────── */
@@ -50,7 +48,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 40 25 25 25;
+  padding: 40px 25px 25px 25px;
 }
 
 /* Logo group */
