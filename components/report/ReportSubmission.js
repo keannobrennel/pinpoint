@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
 import imageCompression from "browser-image-compression";
 import "@/styles/report/report.css";
+import { getNcrCities, getBarangaysForCity } from "@/lib/psgc";
 
 // Same key BottomNav writes to before navigating here.
 const PENDING_PHOTO_KEY = "pendingReportPhoto";
@@ -29,8 +30,8 @@ const PLACARD_STYLES = {
   unsafe: "bg-red-50 text-red-700",
 };
 
-export default function ReportUpload() {
-  const { status } = useAuthGuard(["public", "engineer", "admin"]);
+export default function ReportSubmission() {
+  const { status } = useAuthGuard(["public", "engineer", "admin", "responder"]);
   const router = useRouter();
 
   const [image, setImage] = useState(null);
@@ -38,10 +39,34 @@ export default function ReportUpload() {
   const [location, setLocation] = useState(null);
   const [locationError, setLocationError] = useState(null);
   const [description, setDescription] = useState("");
+  const [cities, setCities] = useState([]);
+  const [selectedCity, setSelectedCity] = useState("");
+  const [barangays, setBarangays] = useState([]);
+  const [selectedBarangay, setSelectedBarangay] = useState("");
+  const [locationDataLoading, setLocationDataLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    getNcrCities()
+      .then(setCities)
+      .catch((err) => console.error("Failed to load cities", err))
+      .finally(() => setLocationDataLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (!selectedCity) {
+      setBarangays([]);
+      setSelectedBarangay("");
+      return;
+    }
+    getBarangaysForCity(selectedCity)
+      .then(setBarangays)
+      .catch((err) => console.error("Failed to load barangays", err));
+    setSelectedBarangay("");
+  }, [selectedCity]);
 
   // Pick up a photo handed off by the BottomNav camera FAB, if there is one.
   useEffect(() => {
@@ -101,7 +126,8 @@ export default function ReportUpload() {
   const handleSubmit = async () => {
     if (!image) return setError("Please select a photo.");
     if (!location) return setError("Please get your location first.");
-
+    if (!selectedCity) return setError("Please select your city.");
+    if (!selectedBarangay) return setError("Please select your barangay.");
     setLoading(true);
     setError(null);
     setResult(null);
@@ -121,6 +147,9 @@ export default function ReportUpload() {
           base64Image: base64Data,
           mimeType,
           location,
+          city: cities.find((c) => c.code === selectedCity)?.name ?? null,
+          barangay:
+            barangays.find((b) => b.code === selectedBarangay)?.name ?? null,
           description,
         }),
       });
@@ -132,6 +161,8 @@ export default function ReportUpload() {
         setResult(data);
       }
     } catch (err) {
+      console.error("[handleSubmit] error:", err);
+
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -148,9 +179,7 @@ export default function ReportUpload() {
           aria-hidden="true"
           className="w-70 object-contain"
         />
-        <h1 className="text-[#01277C] text-2xl font-bold">
-          Analyzing photo
-        </h1>
+        <h1 className="text-[#01277C] text-2xl font-bold">Analyzing photo</h1>
       </div>
     );
   }
@@ -158,7 +187,8 @@ export default function ReportUpload() {
   if (result) {
     const { aiAssessment } = result;
     const placardColor =
-      PLACARD_STYLES[aiAssessment.suggestedPlacard] ?? "bg-gray-100 text-gray-700";
+      PLACARD_STYLES[aiAssessment.suggestedPlacard] ??
+      "bg-gray-100 text-gray-700";
 
     return (
       <div className="report-shell">
@@ -175,15 +205,19 @@ export default function ReportUpload() {
 
             <h2 className="text-2xl font-extrabold text-[#01277C]">
               Report Submitted🎉
-            </h2>          
+            </h2>
           </div>
 
           <p className="text-sm text-gray-500 mb-3 text-start">
             {"Here's the AI pre-assessment of your photo:"}
           </p>
 
-          <span className="text-[#01277C] text-sm font-semibold mb-1">Suggested Placard: </span>
-          <div className={`w-full rounded-full py-2 font-bold text-md ${placardColor} text-center`}>
+          <span className="text-[#01277C] text-sm font-semibold mb-1">
+            Suggested Placard:{" "}
+          </span>
+          <div
+            className={`w-full rounded-full py-2 font-bold text-md ${placardColor} text-center`}
+          >
             {aiAssessment.suggestedPlacard.replace("_", " ").toUpperCase()}
           </div>
 
@@ -211,11 +245,9 @@ export default function ReportUpload() {
           </div>
 
           <p className="text-xs text-gray-400 italic">
-            This is an AI pre-assessment only. An engineer will review and post an
-            official verdict for your zone.
+            This is an AI pre-assessment only. An engineer will review and post
+            an official verdict for your zone.
           </p>
-
-
         </div>
         <div className="submit-button">
           <button
@@ -223,7 +255,7 @@ export default function ReportUpload() {
             className="w-full py-4 mt-3 rounded-xl bg-[#3474FD] text-white text-md font-medium"
           >
             Back to Home
-          </button>  
+          </button>
           <button
             onClick={() => {
               setResult(null);
@@ -237,9 +269,7 @@ export default function ReportUpload() {
             Submit another report
           </button>
         </div>
-
       </div>
-
     );
   }
 
@@ -252,7 +282,10 @@ export default function ReportUpload() {
           onClick={() => router.back()}
           className="flex items-center gap-2 mb-4"
         >
-          <i className="fa-solid fa-arrow-left text-[#2563EB]" aria-hidden="true" />
+          <i
+            className="fa-solid fa-arrow-left text-[#2563EB]"
+            aria-hidden="true"
+          />
           <h2 className="text-[#01277C] font-semibold">Submit a Report</h2>
         </button>
 
@@ -301,23 +334,62 @@ export default function ReportUpload() {
         <div className="flex flex-col gap-2 mb-5">
           <h3 className="text-xl font-bold text-[#01277C]">Pin a location</h3>
           <div className="space-y-1">
-          <button
-            onClick={getLocation}
-            className="w-full py-2 rounded-lg bg-gray-100 text-sm font-medium"
-          >
-            {location
-              ? `Location captured (${location.lat.toFixed(4)}, ${location.lng.toFixed(4)})`
-              : "Get My Location"}
-          </button>
-          {locationError && (
-            <p className="text-xs text-red-500">{locationError}</p>
-          )}
+            <button
+              onClick={getLocation}
+              className="w-full py-2 rounded-lg bg-gray-100 text-sm font-medium"
+            >
+              {location
+                ? `Location captured (${location.lat.toFixed(4)}, ${location.lng.toFixed(4)})`
+                : "Get My Location"}
+            </button>
+            {locationError && (
+              <p className="text-xs text-red-500">{locationError}</p>
+            )}
           </div>
+        </div>
+
+        {/* City & Barangay */}
+        <div className="flex flex-col gap-2 mb-5">
+          <h3 className="text-xl font-bold text-[#01277C]">Location Area</h3>
+
+          <select
+            value={selectedCity}
+            onChange={(e) => setSelectedCity(e.target.value)}
+            disabled={locationDataLoading}
+            className="w-full py-3 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="">
+              {locationDataLoading ? "Loading cities..." : "Select city"}
+            </option>
+            {cities.map((city) => (
+              <option key={city.code} value={city.code}>
+                {city.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedBarangay}
+            onChange={(e) => setSelectedBarangay(e.target.value)}
+            disabled={!selectedCity || barangays.length === 0}
+            className="w-full py-3 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+          >
+            <option value="">
+              {selectedCity ? "Select barangay" : "Select a city first"}
+            </option>
+            {barangays.map((b) => (
+              <option key={b.code} value={b.code}>
+                {b.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Description */}
         <div className="flex flex-col gap-2">
-          <h3 className="text-lg font-semibold text-[#01277C]">Description (Optional)</h3>
+          <h3 className="text-lg font-semibold text-[#01277C]">
+            Description (Optional)
+          </h3>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -335,20 +407,19 @@ export default function ReportUpload() {
               focus:ring-inset
               focus:ring-1
               focus:ring-blue-500
-            "/>        
+            "
+          />
         </div>
 
-
         {error && <p className="text-sm text-red-500">{error}</p>}
-
-      </div>    
+      </div>
       <button
         onClick={handleSubmit}
         disabled={loading}
         className="submit-button w-full py-4 rounded-xl bg-[#3474FD] text-white text-lg font-medium shadow-lg shadow-[#3474FD]/30 disabled:opacity-50"
       >
         {loading ? "Analyzing photo..." : "Submit report"}
-      </button>  
+      </button>
     </div>
   );
 }
