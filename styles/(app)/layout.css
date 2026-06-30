@@ -203,7 +203,7 @@
 
 /* ── FAB (floating camera button) ───────────────────────── */
 .fab-camera {
-  width: 70px;
+  width: 65px;
   aspect-ratio: 1/1;
   border-radius: 50%;
   background: linear-gradient(135deg, #3474FF, #1E51A9);
