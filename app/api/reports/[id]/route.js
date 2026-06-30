@@ -34,9 +34,15 @@ export async function PATCH(request, { params }) {
   }
 
   const body = await request.json();
-  const { engineerVerdict, status } = body;
+  const {
+    placardType,
+    severityScore,
+    inspectorNotes,
+    officialVerdict,
+    status,
+  } = body;
 
-  if (!engineerVerdict || !status) {
+  if (!officialVerdict || !status) {
     return new Response(
       JSON.stringify({ error: "Missing verdict or status" }),
       {
@@ -46,11 +52,18 @@ export async function PATCH(request, { params }) {
     );
   }
 
+  const engineerAssessment = {
+    placardType: placardType ?? null,
+    severityScore: severityScore ?? null,
+    inspectorNotes: inspectorNotes ?? "",
+    officialVerdict,
+    assessedBy: user.uid,
+    assessedAt: new Date().toISOString(),
+  };
+
   await adminDb.collection("reports").doc(params.id).update({
-    engineerVerdict,
+    engineerAssessment,
     status,
-    verifiedBy: user.uid,
-    verifiedAt: new Date().toISOString(),
   });
 
   return new Response(JSON.stringify({ success: true }), {
