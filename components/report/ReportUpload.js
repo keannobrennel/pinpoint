@@ -164,7 +164,7 @@ export default function ReportUpload() {
         </p>
 
         <span className="text-[#01277C] text-sm font-semibold">Suggested Placard: </span>
-        <div className={`w-full rounded-full py-2 font-bold text-sm ${placardColor} text-center border border-[#FDE7C3]`}>
+        <div className={`w-full rounded-full py-2 font-bold text-sm ${placardColor} text-center`}>
           {aiAssessment.suggestedPlacard.replace("_", " ").toUpperCase()}
         </div>
 

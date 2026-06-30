@@ -15,10 +15,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={jakarta.variable}>
-        {children}
-      </body>
+    <html lang="en" className={jakarta.variable}>
+      <body>{children}</body>
     </html>
   );
 }
