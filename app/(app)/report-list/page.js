@@ -15,7 +15,7 @@ export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState("reports"); // "reports" | "community"
 
   return (
-    <div className="min-h-screen bg-[#f4f7fd]">
+    <div className="min-h-screen">
       <ReportsHeader
         isEngineer={isEngineer}
         onFilterClick={() => {
