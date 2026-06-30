@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import ReportsHeader from "@/components/report-list/ReportsHeader";
+import ReportsTabs from "@/components/report-list/ReportsTabs";
 import MyReportsList from "@/components/report-list/MyReportsList";
 import CommunityStats from "@/components/report-list/CommunityStats";
 
@@ -14,23 +15,19 @@ export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState("reports"); // "reports" | "community"
 
   return (
-    <div className="reports-page">
-      <ReportsHeader isEngineer={isEngineer} />
+    <div className="min-h-screen bg-[#f4f7fd]">
+      <ReportsHeader
+        isEngineer={isEngineer}
+        onFilterClick={() => {
+          /* TODO: open filter sheet */
+        }}
+      />
 
-      <div className="reports-tabs">
-        <button
-          className={activeTab === "reports" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("reports")}
-        >
-          {isEngineer ? "Reports" : "My Reports"}
-        </button>
-        <button
-          className={activeTab === "community" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("community")}
-        >
-          Community
-        </button>
-      </div>
+      <ReportsTabs
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        isEngineer={isEngineer}
+      />
 
       {activeTab === "reports" && <MyReportsList isEngineer={isEngineer} />}
       {activeTab === "community" && <CommunityStats isEngineer={isEngineer} />}
