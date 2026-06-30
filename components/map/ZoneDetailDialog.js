@@ -188,18 +188,47 @@ export default function ZoneDetailDialog({ zone, onClose }) {
             {tierConfig.label}
           </div>
 
-          {/* Location name */}
+          {/* Location name — prefer the human-friendly placeName (from the
+              nearby alert) over the reverse-geocoded address; show the
+              geocoded address underneath as a secondary line when both exist. */}
           <p
             style={{
               fontSize: 15,
               fontWeight: 600,
               color: '#111827',
-              margin: '0 0 4px',
+              margin: '0 0 2px',
               paddingRight: 28,
             }}
           >
-            📍 {zoneName}
+            📍 {zone.placeName ?? zoneName}
           </p>
+          {zone.placeName && (
+            <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 4px' }}>
+              {zoneName}
+            </p>
+          )}
+
+          {/* Alert metadata — postedBy / distance / timeAgo, carried over
+              from the NearbyAlertsPage card via "View More" (same object). */}
+          {(zone.postedBy || zone.distance || zone.timeAgo) && (
+            <div style={{ margin: '2px 0 10px' }}>
+              {zone.postedBy && (
+                <p style={{ fontSize: 12, color: '#6b7280', margin: '0 0 2px' }}>
+                  Posted by {zone.postedBy}
+                </p>
+              )}
+              {(zone.distance || zone.timeAgo) && (
+                <p style={{ fontSize: 12, color: '#9ca3af', margin: 0 }}>
+                  {[
+                    zone.distance && `${zone.distance} away`,
+                    zone.timeAgo && `Reported ${zone.timeAgo}`,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Official verdict + severity score, side by side */}
           <div style={{ display: 'flex', gap: 16, margin: '8px 0 4px' }}>
