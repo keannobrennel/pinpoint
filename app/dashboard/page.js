@@ -1,24 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
 import { useAuthGuard } from "@/lib/use-auth-guard";
 import { useReportsFeed, useZonesFeed } from "@/lib/use-dashboard-data";
 import ZoneCard from "@/components/dashboard/ZoneCard";
 import TriageFeed from "@/components/dashboard/TriageFeed";
 
-const ALLOWED_ROLES = ["engineer", "responder", "admin"];
+const ALLOWED_ROLES = ["engineer", "admin"];
 
 export default function DashboardPage() {
-  const router = useRouter();
   const { profile, status } = useAuthGuard(ALLOWED_ROLES);
   const { zones, loading: zonesLoading } = useZonesFeed();
   const { reports, loading: reportsLoading } = useReportsFeed();
   const [selectedZoneId, setSelectedZoneId] = useState(null);
   const [refreshedAt, setRefreshedAt] = useState(() => new Date());
-  const [signingOut, setSigningOut] = useState(false);
 
   if (status !== "ready") {
     return null;
@@ -32,17 +27,6 @@ export default function DashboardPage() {
     // Data already streams live via onSnapshot; this just gives the
     // engineer a visible confirmation that the feed is current.
     setRefreshedAt(new Date());
-  };
-
-  const handleLogout = async () => {
-    setSigningOut(true);
-    try {
-      await signOut(auth);
-      router.replace("/login");
-    } catch (err) {
-      console.error("Logout error:", err);
-      setSigningOut(false);
-    }
   };
 
   return (
@@ -68,14 +52,6 @@ export default function DashboardPage() {
               className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
             >
               Refresh
-            </button>
-            <button
-              type="button"
-              onClick={handleLogout}
-              disabled={signingOut}
-              className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-            >
-              {signingOut ? "Signing out…" : "Sign out"}
             </button>
           </div>
         </div>

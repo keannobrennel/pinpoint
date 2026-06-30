@@ -10,7 +10,6 @@ import CommunityStats from "@/components/report-list/CommunityStats";
 export default function ReportsPage() {
   const { role } = useAuth();
   const isEngineer = role === "engineer";
-  const isStaff = role === "engineer" || role === "admin" || role === "responder";
 
   const [activeTab, setActiveTab] = useState("reports"); // "reports" | "community"
 
@@ -33,7 +32,7 @@ export default function ReportsPage() {
         </button>
       </div>
 
-      {activeTab === "reports" && <MyReportsList isEngineer={isStaff} showReviewButton={isEngineer} />}
+      {activeTab === "reports" && <MyReportsList isEngineer={isEngineer} />}
       {activeTab === "community" && <CommunityStats isEngineer={isEngineer} />}
     </div>
   );
