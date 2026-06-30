@@ -137,6 +137,23 @@ export default function ReportUpload() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="fixed inset-0 z-50 bg-[#EEF2F9] flex flex-col items-center justify-center gap-4 px-6">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/chick4.png"
+          alt=""
+          aria-hidden="true"
+          className="w-70 object-contain"
+        />
+        <h1 className="text-[#01277C] text-2xl font-bold">
+          Analyzing photo
+        </h1>
+      </div>
+    );
+  }
+
   if (result) {
     const { aiAssessment } = result;
     const placardColor =
