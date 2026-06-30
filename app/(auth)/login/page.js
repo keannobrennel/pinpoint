@@ -63,13 +63,14 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-[#EEF2F9]">
-      {/* Hero area — needs relative + fixed height so fill works */}
-      <div className="relative h-64 w-full">
+      {/* Hero area — relative + fixed height so fill works */}
+      <div className="relative h-64 w-full overflow-hidden">
         <Image
           src="/images/city1.png"
           alt="City skyline"
           fill
           priority
+          className="object-cover"
         />
       </div>
 
@@ -156,9 +157,9 @@ export default function LoginPage() {
             Sign Up
           </Link>
         </p>
-
       </div>
-      <div className="mt-8 flex items-center justify-center gap-2">
+
+      <div className="mt-8 mb-5 flex items-center justify-center gap-2">
         <Image src="/icons/check.png" alt="Secure" width={25} height={25} />
         <p className="text-center text-xs text-gray-400">
           Your information is secure with us.{" "}
