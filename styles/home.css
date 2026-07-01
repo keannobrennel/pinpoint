@@ -1,0 +1,7 @@
+/* styles/home.css — Home page specific styles */
+
+.home-page {
+  padding-top: var(--header-h);
+}
+
+/* Add Home-only styles here */

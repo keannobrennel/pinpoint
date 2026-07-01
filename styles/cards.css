@@ -1,0 +1,175 @@
+/* styles/cards.css
+   ReportCard, IncidentCard, AnnouncementCard.
+*/
+
+/* ── Report Card / Incident Card ── */
+.report-card {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  background: var(--pp-white);
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(26, 43, 94, 0.08);
+  text-align: left;
+  cursor: pointer;
+  border: none;
+  transition: box-shadow 0.15s;
+}
+
+.report-card:active {
+  box-shadow: 0 1px 4px rgba(26, 43, 94, 0.12);
+}
+
+.report-card__img-wrap {
+  position: relative;
+  width: 96px;
+  min-width: 96px;
+  height: 96px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--pp-border);
+  flex-shrink: 0;
+}
+
+.report-card__img {
+  object-fit: cover;
+}
+
+.report-card__img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pp-muted);
+  font-size: 24px;
+}
+
+.report-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.report-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.report-card__arrow {
+  color: #2563eb;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.report-card__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--pp-navy);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.report-card__location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--pp-muted);
+}
+
+.report-card__location i {
+  font-size: 11px;
+  color: var(--pp-muted);
+}
+
+.report-card__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--pp-muted);
+}
+
+.report-card__count {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  color: var(--pp-navy);
+  font-size: 12px;
+}
+
+.report-card__count i {
+  font-size: 12px;
+}
+
+/* ── Announcement Card ── */
+.announcement-card {
+  background: var(--pp-white);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 2px 8px rgba(26, 43, 94, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.announcement-card__type {
+  font-size: 10px;
+  font-weight: 700;
+  color: #f97316;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.announcement-card__time {
+  font-size: 11px;
+  color: var(--pp-muted);
+}
+
+.announcement-card__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--pp-navy);
+}
+
+.announcement-card__location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--pp-muted);
+}
+
+.announcement-card__location i {
+  font-size: 11px;
+}
+
+.announcement-card__body {
+  font-size: 12px;
+  color: #374151;
+  line-height: 1.5;
+  margin-top: 2px;
+}
+
+.announcement-card__posted-by {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #22c55e;
+  margin-top: 4px;
+}
+
+.announcement-card__posted-by i {
+  font-size: 12px;
+}

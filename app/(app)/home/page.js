@@ -6,7 +6,7 @@ import Header from "@/components/layout/Header";
 import Greeting from "@/components/home/Greeting";
 import HomeBottomCard from "@/components/home/HomeBottomCard";
 import MapView from "@/components/map/MapView";
-import "@/styles/(app)/home.css";
+import "@/styles/home.css";
 
 export default function HomePage() {
   const { user, role } = useAuth();
