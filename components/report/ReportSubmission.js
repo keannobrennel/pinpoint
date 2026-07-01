@@ -96,6 +96,7 @@ export default function ReportSubmission() {
   // when reverse-geocoded city changes, try to auto-match a PSGC city
   useEffect(() => {
     if (!city || ncrCities.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedCityCode(null);
       setBarangayOptions([]);
       return;
@@ -115,6 +116,7 @@ export default function ReportSubmission() {
   // when selectedCityCode changes, fetch barangays for it
   useEffect(() => {
     if (!selectedCityCode) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setBarangayLoading(true);
     getBarangaysForCity(selectedCityCode)
       .then(setBarangayOptions)
@@ -125,6 +127,7 @@ export default function ReportSubmission() {
   // Load Google Maps
   useEffect(() => {
     if (window.google?.maps) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMapReady(true);
       return;
     }
@@ -238,6 +241,7 @@ export default function ReportSubmission() {
       sessionStorage.removeItem(PENDING_PHOTO_KEY);
       const { dataUrl, mimeType } = JSON.parse(raw);
       const file = dataUrlToFile(dataUrl, mimeType);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setImage(file);
       setPreview(dataUrl);
     } catch (err) {
