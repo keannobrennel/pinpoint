@@ -40,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# firebase service account key (never commit, has admin access)
+service-account.json
+
+# dev-only firestore seeder scripts, not part of the deployed app
+/seeder/
