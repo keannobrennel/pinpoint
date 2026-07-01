@@ -1,0 +1,246 @@
+/* ---------- Design tokens ----------
+   Colors, font, and header height come from styles/tokens.css
+   (--pp-*). Only local, page-specific tokens are defined here. */
+.page {
+  --color-blue-hover: color-mix(in srgb, var(--pp-main) 85%, black);
+  --color-blue-active: color-mix(in srgb, var(--pp-main) 70%, black);
+  --color-field-bg: color-mix(in srgb, var(--pp-bg) 60%, white);
+  --color-error-bg: #fef2f2;
+  --color-error-text: #dc2626;
+  --radius-lg: 1.5rem;
+  --radius-md: 0.75rem;
+
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  background-color: var(--pp-bg);
+  font-family: var(--pp-font), -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  position: relative;
+  height: 11rem;
+  width: 100%;
+  overflow: hidden;
+}
+
+.heroImage {
+  object-fit: cover;
+}
+
+.logo {
+  position: absolute;
+  top: 4.25rem;
+  left: 1.25rem;
+  z-index: 2;
+}
+
+.mascot {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.7rem;
+  z-index: 3;
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.15));
+}
+
+/* ---------- Card ---------- */
+.card {
+  position: relative;
+  z-index: 1;
+  margin: -2.5rem 1.25rem 0;
+  border-radius: var(--radius-lg);
+  background-color: var(--pp-surface);
+  padding: 1.7rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--pp-main);
+  margin: 0;
+}
+
+.subtitle {
+  margin: 0.25rem 0 1.2rem;
+  font-size: 0.775rem;
+  color: var(--pp-muted);
+}
+
+.error {
+  margin-bottom: 1rem;
+  border-radius: var(--radius-md);
+  background-color: var(--color-error-bg);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-error-text);
+}
+
+/* ---------- Form ---------- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  margin-bottom: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--pp-navy);
+}
+
+.input {
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--pp-border);
+  background-color: var(--color-field-bg);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: var(--pp-navy);
+}
+
+.input::placeholder {
+  color: var(--pp-muted);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--pp-main);
+  background-color: var(--pp-surface);
+  box-shadow: 0 0 0 1px var(--pp-main);
+}
+
+.hint {
+  margin-top: 0.375rem;
+  font-size: 0.7rem;
+  color: var(--pp-muted);
+}
+
+.submitBtn {
+  margin-top: 0.5rem;
+  width: 100%;
+  border: none;
+  border-radius: var(--radius-md);
+  background-color: var(--pp-main);
+  padding: 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--pp-white);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background-color: var(--color-blue-hover);
+}
+
+.submitBtn:active:not(:disabled) {
+  background-color: var(--color-blue-active);
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------- Divider ---------- */
+.divider {
+  margin: 1.25rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dividerLine {
+  height: 1px;
+  flex: 1;
+  background-color: var(--pp-border);
+}
+
+.dividerText {
+  font-size: 0.75rem;
+  color: var(--pp-muted);
+}
+
+/* ---------- Google button ---------- */
+.googleBtn {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--pp-border);
+  background-color: var(--pp-surface);
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+}
+
+.googleBtn:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--pp-bg) 40%, white);
+}
+
+.googleBtn:active:not(:disabled) {
+  background-color: color-mix(in srgb, var(--pp-bg) 60%, white);
+}
+
+.googleBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.googleIcon {
+  height: 1.25rem;
+  width: 1.25rem;
+}
+
+/* ---------- Footer bits ---------- */
+.loginText {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--pp-muted);
+}
+
+.loginLink {
+  font-weight: 600;
+  color: var(--pp-main);
+  text-decoration: none;
+}
+
+.loginLink:hover {
+  color: var(--color-blue-hover);
+}
+
+.footer {
+  margin: 2rem 1.25rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.footerIcon {
+  flex-shrink: 0;
+  color: var(--pp-main);
+}
+
+.footerText {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--pp-muted);
+}
+
+.footerText span {
+  display: block;
+}
