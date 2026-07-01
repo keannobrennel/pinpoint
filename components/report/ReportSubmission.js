@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
 import imageCompression from "browser-image-compression";
 import "@/styles/report/report.css";
+import "@/styles/detail.css";
+import ScreenHeader from "@/components/layout/ScreenHeader";
 
 const PENDING_PHOTO_KEY = "pendingReportPhoto";
 
@@ -346,7 +348,7 @@ export default function ReportSubmission() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 bg-[#EEF2F9] flex flex-col items-center justify-center gap-4 px-6">
+      <div className="fixed inset-0 flex flex-col items-center justify-center gap-4 px-6">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/images/chick4.png"
@@ -443,19 +445,9 @@ export default function ReportSubmission() {
 
   return (
     <div className="report-shell">
-      <div className="report-content pb-28">
+      <div className="report-content">
         {/* Header */}
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="flex items-center gap-2 mb-4"
-        >
-          <i
-            className="fa-solid fa-arrow-left text-[#2563EB]"
-            aria-hidden="true"
-          />
-          <h2 className="text-[#01277C] font-semibold">Submit a Report</h2>
-        </button>
+        <ScreenHeader title="Submit a report" />
 
         {/* Photo */}
         <div className="flex flex-col gap-2 mb-5">
@@ -587,13 +579,15 @@ export default function ReportSubmission() {
         {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
       </div>
 
-      <button
-        onClick={handleSubmit}
-        disabled={loading}
-        className="submit-button w-full py-4 rounded-xl bg-[#3474FD] text-white text-lg font-medium shadow-lg shadow-[#3474FD]/30 disabled:opacity-50"
-      >
-        {loading ? "Analyzing photo..." : "Submit report"}
-      </button>
+      <div className="submit-button">
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="w-full py-4 rounded-xl bg-[#3474FD] text-white text-lg font-medium shadow-lg shadow-[#3474FD]/30 disabled:opacity-50"
+        >
+          {loading ? "Analyzing photo..." : "Submit report"}
+        </button>
+      </div>
     </div>
   );
 }
