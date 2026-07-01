@@ -20,6 +20,27 @@ const PLACARD_STYLES = {
   unsafe: "bg-red-50 text-red-700",
 };
 
+const FINDING_STYLES = {
+  no_further_action: "bg-green-50 text-green-700",
+  monitor_or_rescreen: "bg-orange-50 text-orange-600",
+  refer_to_obo: "bg-blue-50 text-blue-700",
+};
+
+const FINDING_LABELS = {
+  no_further_action: "Looks Okay",
+  monitor_or_rescreen: "Keep an Eye On It",
+  refer_to_obo: "Needs Official Inspection",
+};
+
+const FINDING_DESCRIPTIONS = {
+  no_further_action:
+    "No visible signs of structural concern. No action needed for now.",
+  monitor_or_rescreen:
+    "Minor issue spotted. Not urgent, but worth checking again later.",
+  refer_to_obo:
+    "This has been flagged for your city's Office of the Building Official to send an inspector for a closer look.",
+};
+
 function dataUrlToFile(dataUrl, mimeType, filename = "hazard-photo.jpg") {
   const base64 = dataUrl.split(",")[1];
   const binary = atob(base64);
@@ -72,6 +93,7 @@ export default function ReportSubmission() {
   const [barangay, setBarangay] = useState(null);
   const [locationLabel, setLocationLabel] = useState("");
   const [description, setDescription] = useState("");
+  const [mode, setMode] = useState("pre_disaster");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
@@ -315,6 +337,7 @@ export default function ReportSubmission() {
           city,
           barangay,
           description,
+          mode,
         }),
       });
 
@@ -341,6 +364,7 @@ export default function ReportSubmission() {
     setBarangay(null);
     setLocationLabel("");
     setDescription("");
+    setMode("pre_disaster");
     setSelectedCityCode(null);
     setBarangayOptions([]);
     if (markerRef.current) markerRef.current.setVisible(false);
@@ -367,9 +391,17 @@ export default function ReportSubmission() {
 
   if (result) {
     const { aiAssessment } = result;
-    const placardColor =
-      PLACARD_STYLES[aiAssessment.suggestedPlacard] ??
-      "bg-gray-100 text-gray-700";
+    const isPre = aiAssessment.mode === "pre_disaster";
+
+    const verdictKey = isPre
+      ? aiAssessment.suggestedFinding
+      : aiAssessment.suggestedPlacard;
+    const verdictLabel = isPre
+      ? (FINDING_LABELS[verdictKey] ?? formatLabel(verdictKey))
+      : formatLabel(verdictKey);
+    const verdictColor = isPre
+      ? (FINDING_STYLES[verdictKey] ?? "bg-gray-100 text-gray-700")
+      : (PLACARD_STYLES[verdictKey] ?? "bg-gray-100 text-gray-700");
 
     return (
       <div className="report-shell">
@@ -388,17 +420,25 @@ export default function ReportSubmission() {
           </div>
 
           <p className="text-sm text-gray-500 mb-3 text-start">
-            {"Here's the AI pre-assessment of your photo:"}
+            {isPre
+              ? "Here's the AI screening result for your photo:"
+              : "Here's the AI pre-assessment of your photo:"}
           </p>
 
           <span className="text-[#01277C] text-sm font-semibold mb-1">
-            Suggested Placard:{" "}
+            {isPre ? "Screening Finding: " : "Suggested Placard: "}
           </span>
           <div
-            className={`w-full rounded-full py-2 font-bold text-md ${placardColor} text-center`}
+            className={`w-full rounded-full py-2 font-bold text-md ${verdictColor} text-center`}
           >
-            {formatLabel(aiAssessment.suggestedPlacard)}
+            {verdictLabel}
           </div>
+
+          {isPre && (
+            <p className="text-xs text-gray-500 mt-1">
+              {FINDING_DESCRIPTIONS[verdictKey]}
+            </p>
+          )}
 
           <div className="w-full text-left rounded-2xl border border-[#D4E1EE] p-4 flex flex-col gap-2 text-sm my-3">
             <div>
@@ -406,16 +446,24 @@ export default function ReportSubmission() {
               {formatLabel(aiAssessment.damageClassification)}
             </div>
             <div>
-              <span className="font-semibold">Severity: </span>
+              <span className="font-semibold">
+                {isPre ? "Screening Priority: " : "Severity: "}
+              </span>
               {aiAssessment.severityScore} / 100
             </div>
             <div>
               <span className="font-semibold">Structure: </span>
               {aiAssessment.affectedStructureType}
             </div>
+            {isPre && aiAssessment.visibleIrregularities?.length > 0 && (
+              <div>
+                <span className="font-semibold">Irregularities: </span>
+                {aiAssessment.visibleIrregularities.map(formatLabel).join(", ")}
+              </div>
+            )}
             <div>
               <span className="font-semibold">Summary: </span>
-              {aiAssessment.placardReasoning}
+              {aiAssessment.reasoning ?? aiAssessment.placardReasoning}
             </div>
             <div>
               <span className="font-semibold">Recommended Action: </span>
@@ -424,8 +472,9 @@ export default function ReportSubmission() {
           </div>
 
           <p className="text-xs text-gray-400 italic">
-            This is an AI pre-assessment only. An engineer will review and post
-            an official verdict for your zone.
+            {isPre
+              ? "This is an AI pre-disaster screening only. It is not a placard or occupancy determination. An engineer or your LGU OBO may refer this for detailed evaluation."
+              : "This is an AI pre-assessment only. An engineer will review and post an official verdict for your zone."}
           </p>
         </div>
 
@@ -452,6 +501,40 @@ export default function ReportSubmission() {
       <div className="report-content">
         {/* Header */}
         <ScreenHeader title="Submit a report" />
+
+        {/* Report Type toggle */}
+        <div className="flex flex-col gap-2 mb-5">
+          <h3 className="text-xl font-bold text-[#01277C]">Report Type</h3>
+          <div className="flex rounded-xl border border-gray-200 p-1 bg-gray-50">
+            <button
+              type="button"
+              onClick={() => setMode("pre_disaster")}
+              className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition ${
+                mode === "pre_disaster"
+                  ? "bg-[#3474FD] text-white"
+                  : "text-gray-500"
+              }`}
+            >
+              Pre-Disaster Screening
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("post_disaster")}
+              className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition ${
+                mode === "post_disaster"
+                  ? "bg-[#3474FD] text-white"
+                  : "text-gray-500"
+              }`}
+            >
+              Post-Disaster Damage
+            </button>
+          </div>
+          <p className="text-xs text-gray-400">
+            {mode === "pre_disaster"
+              ? "For everyday hazards you notice — cracks, leaning walls, loose parts. No active disaster."
+              : "For damage observed after an earthquake, typhoon, or other disaster event."}
+          </p>
+        </div>
 
         {/* Photo */}
         <div className="flex flex-col gap-2 mb-5">
