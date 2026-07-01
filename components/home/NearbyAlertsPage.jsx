@@ -173,6 +173,20 @@ export default function NearbyAlertsPage({
           </button>
         </div>
       )}
+
+      {hasAlerts && alerts.length > 1 && (
+        <div className="nearby-alerts-page__dots">
+          {alerts.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              className={`nearby-alerts-page__dot${i === safeIndex ? ' nearby-alerts-page__dot--active' : ''}`}
+              onClick={() => onIndexChange?.(i)}
+              aria-label={`Go to alert ${i + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
