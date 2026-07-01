@@ -52,40 +52,46 @@ export default function ProfilePage() {
         }
       />
 
-      {/* City skyline hero — sits behind the avatar card */}
-      <div className="profile-page__hero" aria-hidden="true">
-        <img src="/images/city2.png" alt="" className="profile-page__city profile-page__city--left" />
-        <img src="/images/city2.png" alt="" className="profile-page__city profile-page__city--right" />
-      </div>
+      {/* City skyline hero + avatar card. The avatar itself is positioned
+          absolutely so only its bottom half sits over the white card —
+          the top half (and sides) stay over the city skyline behind it. */}
+      <div className="profile-page__hero-wrap">
+        <div className="profile-page__hero" aria-hidden="true">
+          <img src="/images/city2.png" alt="" className="profile-page__city profile-page__city--left" />
+          <img src="/images/city2.png" alt="" className="profile-page__city profile-page__city--right" />
+        </div>
 
-      {/* Avatar card — profile-specific, no equivalent in detail-screen */}
-      <div className="detail-screen__card profile-page__avatar-card">
-        {photoURL ? (
-          <Image
-            src={photoURL}
-            alt={displayName}
-            width={140}
-            height={140}
-            className="profile-page__avatar-image"
-          />
-        ) : (
-          <div className="profile-page__avatar-fallback" aria-hidden="true">
-            {initial}
-          </div>
-        )}
-        <h2 className="profile-page__name">{displayName}</h2>
-        {email ? <p className="profile-page__email">{email}</p> : null}
-        {role ? (
-          <>
-            <span className="profile-page__role-badge">
-              <span className="profile-page__role-badge-icon" aria-hidden="true">
-                👤
+        <div className="detail-screen__card profile-page__avatar-card">
+          <h2 className="profile-page__name">{displayName}</h2>
+          {email ? <p className="profile-page__email">{email}</p> : null}
+          {role ? (
+            <>
+              <span className="profile-page__role-badge">
+                <span className="profile-page__role-badge-icon" aria-hidden="true">
+                  👤
+                </span>
+                {formatRole(role)}
               </span>
-              {formatRole(role)}
-            </span>
-            <p className="profile-page__role-caption">Account Type</p>
-          </>
-        ) : null}
+              <p className="profile-page__role-caption">Account Type</p>
+            </>
+          ) : null}
+        </div>
+
+        <div className="profile-page__avatar-photo-wrap">
+          {photoURL ? (
+            <Image
+              src={photoURL}
+              alt={displayName}
+              width={140}
+              height={140}
+              className="profile-page__avatar-image"
+            />
+          ) : (
+            <div className="profile-page__avatar-fallback" aria-hidden="true">
+              {initial}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Static nav rows — no routes yet, wired up as stubs */}

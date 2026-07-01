@@ -71,55 +71,60 @@ export default function ProfileEditPage() {
     <div className="detail-screen">
       <ScreenHeader title="Edit Profile" onBack={() => router.push("/profile")} />
 
-      {/* City skyline hero — sits behind the avatar card */}
-      <div className="profile-page__hero" aria-hidden="true">
-        <img src="/images/city2.png" alt="" className="profile-page__city profile-page__city--left" />
-        <img src="/images/city2.png" alt="" className="profile-page__city profile-page__city--right" />
-      </div>
-
-      {/* Avatar card — photo now has an upload overlay, name is editable */}
-      <div className="detail-screen__card profile-page__avatar-card">
-        <div className="profile-page__avatar-wrap">
-          {photoPreview ? (
-            <img src={photoPreview} alt={name} className="profile-page__avatar-image" />
-          ) : (
-            <div className="profile-page__avatar-fallback" aria-hidden="true">
-              {initial}
-            </div>
-          )}
-          <label htmlFor="avatar-upload" className="profile-page__avatar-overlay">
-            <i className="fa-solid fa-camera" aria-hidden="true" />
-          </label>
-          <input
-            id="avatar-upload"
-            type="file"
-            accept="image/*"
-            className="profile-page__avatar-file-input"
-            onChange={handlePhotoChange}
-          />
+      {/* City skyline hero + avatar card. The avatar itself is positioned
+          absolutely so only its bottom half sits over the white card —
+          the top half (and sides) stay over the city skyline behind it. */}
+      <div className="profile-page__hero-wrap">
+        <div className="profile-page__hero" aria-hidden="true">
+          <img src="/images/city2.png" alt="" className="profile-page__city profile-page__city--left" />
+          <img src="/images/city2.png" alt="" className="profile-page__city profile-page__city--right" />
         </div>
 
-        <input
-          type="text"
-          className="profile-page__name-input"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Your name"
-        />
-        {email ? <p className="profile-page__email">{email}</p> : null}
-        {role ? (
-          <>
-            <span className="profile-page__role-badge">
-              <span className="profile-page__role-badge-icon" aria-hidden="true">
-                👤
+        <div className="detail-screen__card profile-page__avatar-card">
+          <input
+            type="text"
+            className="profile-page__name-input"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Your name"
+          />
+          {email ? <p className="profile-page__email">{email}</p> : null}
+          {role ? (
+            <>
+              <span className="profile-page__role-badge">
+                <span className="profile-page__role-badge-icon" aria-hidden="true">
+                  👤
+                </span>
+                {formatRole(role)}
               </span>
-              {formatRole(role)}
-            </span>
-            <p className="profile-page__role-caption">Account Type</p>
-          </>
-        ) : null}
+              <p className="profile-page__role-caption">Account Type</p>
+            </>
+          ) : null}
 
-        {error ? <p className="profile-page__field-error">{error}</p> : null}
+          {error ? <p className="profile-page__field-error">{error}</p> : null}
+        </div>
+
+        <div className="profile-page__avatar-photo-wrap">
+          <div className="profile-page__avatar-wrap">
+            {photoPreview ? (
+              <img src={photoPreview} alt={name} className="profile-page__avatar-image" />
+            ) : (
+              <div className="profile-page__avatar-fallback" aria-hidden="true">
+                {initial}
+              </div>
+            )}
+            <label htmlFor="avatar-upload" className="profile-page__avatar-overlay">
+              <i className="fa-solid fa-camera" aria-hidden="true" />
+            </label>
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              className="profile-page__avatar-file-input"
+              onChange={handlePhotoChange}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Static nav rows — no routes yet, wired up as stubs */}
