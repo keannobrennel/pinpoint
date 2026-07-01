@@ -43,6 +43,7 @@ export default function NearbyAlertsPage({
   activeIndex = 0,
   onIndexChange,
   onViewMore,
+  onGoTo,
 }) {
   const infoRef = useRef(null);
   const [iconFontSize, setIconFontSize] = useState(ICON_MIN_PX);
@@ -151,13 +152,31 @@ export default function NearbyAlertsPage({
 
               {metaText && <p className="nearby-alerts-page__meta">{metaText}</p>}
 
-              <button
-                type="button"
-                className="nearby-alerts-page__view-more"
-                onClick={() => onViewMore?.(current)}
-              >
-                View More
-              </button>
+              {/*
+                Action row — "Go to" flies the map to this exact alert's
+                location without changing the carousel index or opening the
+                dialog (that's what View More is for). Same width as View
+                More via the shared .nearby-alerts-page__actions flex row
+                (flex: 1 on both buttons) rather than a fixed pixel width,
+                so they stay evenly matched at any card size.
+              */}
+              <div className="nearby-alerts-page__actions">
+                <button
+                  type="button"
+                  className="nearby-alerts-page__go-to"
+                  onClick={() => onGoTo?.(current)}
+                  aria-label={`Go to ${current.placeName ?? 'this location'} on the map`}
+                >
+                  Go to
+                </button>
+                <button
+                  type="button"
+                  className="nearby-alerts-page__view-more"
+                  onClick={() => onViewMore?.(current)}
+                >
+                  View More
+                </button>
+              </div>
             </div>
           </div>
 

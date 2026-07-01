@@ -278,15 +278,20 @@ const MAP_STYLES = [
  *   - RASTER / unknown → flyToRaster() — three-phase fallback, since raster
  *               tiles don't animate fractional zoom reliably.
  *
- * Deliberately skips the very first run: on initial mount, focusZone is
- * already set to alert index 0, but we don't want to fly the camera away
- * from the user's actual location/default view just because a card happens
- * to be showing. The camera should only move in response to the user
- * explicitly stepping through alerts.
+ * NOTE: there is deliberately NO "skip the first effect run" logic here
+ * anymore. An earlier version tried to skip flying on initial mount that
+ * way, but useMap() resolves asynchronously (null → real instance a beat
+ * later), which meant the effect actually fired twice on mount and the
+ * "skip" landed on the wrong one — causing an unwanted flight to
+ * nearbyAlerts[0] a few seconds after the page loaded, even though nobody
+ * touched the carousel. The fix now lives one level up: the parent
+ * (app/(app)/home/page.js) simply withholds `focusZone` (passes null)
+ * until the user has genuinely interacted with the carousel. So this
+ * component can stay dumb — if focusZone is falsy, it does nothing, full
+ * stop, regardless of how many times or in what order the effect fires.
  */
 function MapController({ focusZone }) {
   const map = useMap();
-  const isFirstRun = useRef(true);
   const cancelFlightRef = useRef(null);
   const renderingTypeRef = useRef(null);
 
@@ -303,11 +308,6 @@ function MapController({ focusZone }) {
   }, [map]);
 
   useEffect(() => {
-    if (isFirstRun.current) {
-      isFirstRun.current = false;
-      return;
-    }
-
     if (!map || !focusZone?.centerCoordinates || typeof google === 'undefined') return;
     const { lat, lng } = focusZone.centerCoordinates;
     if (lat == null || lng == null) return;
@@ -328,7 +328,6 @@ function MapController({ focusZone }) {
 
   return null;
 }
-
 // Add this near MapController, inside MapView.js
 
 /**
