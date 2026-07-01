@@ -212,3 +212,12 @@
 .detail-screen__action-btn:active {
   opacity: 0.85;
 }
+
+/* ── Stacked-footer clearance ──
+   Screens whose footer stacks two full-width buttons (Review Assessment,
+   Assessment Finished) are taller than the single-row Cancel/Next footer
+   the default 120px padding-bottom was tuned for — bump it so content
+   scrolls clear instead of hiding behind the buttons. */
+.detail-screen--stacked-footer {
+  padding-bottom: 200px;
+}

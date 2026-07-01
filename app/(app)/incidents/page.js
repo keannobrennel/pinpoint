@@ -23,7 +23,19 @@ const MOCK_INCIDENTS = [
     verdictPostedAt: "2026-06-29T10:00:00.000Z",
     verdictPostedBy: "Responder 01",
     updatedAt: "2026-06-29T10:02:00.000Z",
-    disasterMode: true,
+    disasterMode: true, // post-disaster -> Form B
+  },
+  {
+    id: "2",
+    imageUrl: null,
+    name: "Leaning Perimeter Wall in Norzagaray",
+    center: { lat: 14.9112, lng: 121.0186 },
+    reportCount: 6,
+    officialVerdict: "pending",
+    verdictPostedAt: "2026-06-30T09:00:00.000Z",
+    verdictPostedBy: "Responder 02",
+    updatedAt: "2026-06-30T09:05:00.000Z",
+    disasterMode: false, // pre-disaster -> Form A
   },
 ];
 

@@ -10,6 +10,7 @@ import "@/styles/shell.css";
 import "@/styles/badges.css";
 import "@/styles/cards.css";
 import "@/styles/detail.css";
+import "@/styles/assessment.css"; 
 
 export default function DetailLayout({ children }) {
   return (

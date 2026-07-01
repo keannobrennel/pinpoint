@@ -326,8 +326,8 @@ export default function HomePage() {
             alerts={nearbyAlerts}
             stats={stats}
             isEngineer={isEngineer}
-            activeAlertIndex={activeAlertIndex}
-            onAlertIndexChange={handleAlertIndexChange}
+            activeIndex={activeAlertIndex}
+            onIndexChange={handleAlertIndexChange}
             onViewMore={handleViewMore}
           />
         </div>
