@@ -1,0 +1,33 @@
+{
+  "name": "pinpoint",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.3.0",
+    "@google/generative-ai": "^0.24.1",
+    "@googlemaps/js-api-loader": "^2.1.1",
+    "@react-google-maps/api": "^2.20.8",
+    "@vis.gl/react-google-maps": "^1.8.3",
+    "browser-image-compression": "^2.0.2",
+    "firebase": "^12.15.0",
+    "firebase-admin": "^14.1.0",
+    "framer-motion": "^12.42.0",
+    "lucide-react": "^1.22.0",
+    "next": "16.2.9",
+    "radix-ui": "^1.6.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.9",
+    "tailwindcss": "^4"
+  }
+}

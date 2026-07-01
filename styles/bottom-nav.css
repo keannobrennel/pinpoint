@@ -1,0 +1,112 @@
+/* styles/bottom-nav.css
+   Bottom navigation bar and floating camera FAB.
+*/
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px 25px 20px 25px;
+  right: 0;
+  left: 0;
+  z-index: 100;
+  height: 8%;
+  gap: 13px;
+}
+
+.bottom-nav__list {
+  display: flex;
+  flex: 1;
+  align-items: stretch;
+  height: 100%;
+  padding: 2px;
+  list-style: none;
+  background: var(--pp-white);
+  box-shadow: 0 4px 16px rgba(26, 43, 94, 0.15);
+  transition: background 0.15s, transform 0.15s;
+  border-radius: 50px;
+}
+
+.bottom-nav__item {
+  flex: 1;
+}
+
+.bottom-nav__link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 100%;
+  text-decoration: none;
+  color: var(--pp-muted);
+  transition: color 0.15s;
+}
+
+.bottom-nav__link--active {
+  color: #2563EB;
+}
+
+.bottom-nav__icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+}
+
+.bottom-nav__icon-wrap i {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.bottom-nav__label {
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.bottom-nav__badge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: var(--pp-orange);
+  color: var(--pp-white);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border: 2px solid var(--pp-white);
+}
+
+.fab-camera {
+  height: 100%;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3474FF, #1E51A9);
+  color: var(--pp-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(26, 43, 94, 0.35);
+  transition: filter 0.15s, transform 0.15s;
+}
+
+.fab-camera:hover,
+.fab-camera:focus-visible {
+  background: var(--pp-navy);
+  transform: scale(1.03);
+  outline: none;
+}
+
+.fab-camera i {
+  font-size: 27px;
+}

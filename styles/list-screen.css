@@ -1,0 +1,91 @@
+/* styles/list-screen.css
+   ListScreenShell and FilterBar — used by Community, Reports, Incidents.
+*/
+
+.list-screen {
+  display: flex;
+  flex-direction: column;
+  padding-top: 40px;
+  gap: 12px;
+  height: 100%;
+}
+
+.list-screen__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.list-screen__title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.list-screen__title {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--pp-main);
+  line-height: 1.1;
+}
+
+.list-screen__subtitle {
+  font-size: 12px;
+  color: var(--pp-muted);
+  font-weight: 400;
+}
+
+.list-screen__filter-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1.5px solid var(--pp-border);
+  background: var(--pp-white);
+  color: var(--pp-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.list-screen__filter-btn i {
+  font-size: 16px;
+}
+
+.list-screen__content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 100px;
+}
+
+/* ── Filter Bar ── */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-bar__pill {
+  padding: 6px 14px;
+  border-radius: 50px;
+  border: 1.5px solid var(--pp-border);
+  background: var(--pp-white);
+  color: var(--pp-muted);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--pp-font);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.filter-bar__pill--active {
+  background: var(--pp-navy);
+  color: var(--pp-white);
+  border-color: var(--pp-navy);
+}
