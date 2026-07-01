@@ -1,18 +1,27 @@
-// components/home/Greeting.jsx
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Greeting({ isEngineer, userName }) {
   return (
     <div className="greeting-card">
-      <p className="greeting-text">
-        {isEngineer
-          ? "Good morning, Engineer!"
-          : `Good morning, ${userName}!`}
-      </p>
-      <p className="greeting-subtext">Help keep your community safe</p>
+      <div className="greeting-content">
+        <p className="greeting-text">Good morning,</p>
+        <p className="greeting-subtext">
+          {isEngineer
+            ? "Oversee your community's safety"
+            : <>Help keep your<br />community <span className="greeting-highlight">safe</span></>}
+        </p>
+      </div>
 
-      <Link href="/report/new">
-        <button className="report-hazard-btn">📷 Report Hazard</button>
+      <div className="greeting-mascot">
+        <Image src="/images/chick1.png" alt="" width={180} height={180} priority />
+      </div>
+
+      <Link href="/report/new" className="report-hazard-link">
+        <button className="report-hazard-btn">
+          <i className="fa-regular fa-camera fa-xl"></i>
+          Report Hazard
+          </button>
       </Link>
     </div>
   );
