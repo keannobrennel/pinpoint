@@ -1,7 +1,8 @@
 // app/(app)/home/page.js
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useZones } from "@/hooks/useZones";
 import { useGeolocation } from "@/hooks/useGeolocation";
@@ -11,14 +12,43 @@ import HomeBottomCard from "@/components/home/HomeBottomCard";
 import MapView from "@/components/map/MapView";
 import "@/styles/(app)/home.css";
 
+// Duration of the overlay slide transform — kept as a named constant so the
+// "wait for the animation to finish, THEN navigate" timeout below can never
+// drift out of sync with the CSS transition it's timed against.
+const OVERLAY_TRANSITION_MS = 320;
+
 export default function HomePage() {
+  const router = useRouter();
   const { user, role } = useAuth();
   const isEngineer = role === "engineer";
 
   const { zones: realZones } = useZones();
   const { location, zoom } = useGeolocation();
-  // Add alongside the other useState calls
   const [isMapInteracting, setIsMapInteracting] = useState(false);
+
+  // ── Entrance animation ──────────────────────────────────────────────────
+  // Starts "hidden" (as if mid-exit) and flips to visible one tick after
+  // mount, so the overlays visibly slide INTO place every time this page
+  // mounts — including when the user taps <BackButton> on /map and lands
+  // back here (Next.js fully remounts the page on a route change like
+  // (public)/map → (app)/home, so this fires again naturally).
+  const [hasEntered, setHasEntered] = useState(false);
+  useEffect(() => {
+    const id = setTimeout(() => setHasEntered(true), 20);
+    return () => clearTimeout(id);
+  }, []);
+
+  // ── Exit animation — triggered by the "Go to Map" button ───────────────
+  // Slides the overlays out first, THEN navigates once the transition has
+  // had time to finish, so the transition is actually seen instead of the
+  // page unmounting mid-slide.
+  const [isLeavingToMap, setIsLeavingToMap] = useState(false);
+  const handleGoToMap = () => {
+    if (isLeavingToMap) return; // guard against double-taps
+    setIsLeavingToMap(true);
+    setTimeout(() => router.push("/map"), OVERLAY_TRANSITION_MS);
+  };
+
   // TEMP TEST DATA — remove before merging
   //
   // Wrapped in useMemo so the array keeps stable object identities across
@@ -192,16 +222,19 @@ export default function HomePage() {
   // index changes — independent of whether the dialog is open or closed.
   const focusZone = nearbyAlerts[activeAlertIndex] ?? null;
 
-  // Overlays (Greeting + NearbyAlerts/HomeBottomCard) should hide whenever
-  // the map is being interacted with (panning/zooming) OR a zone dialog is
-  // open (tapped a heatmap blob or an engineer pin). They come back once
-  // both are false — i.e. the map settles AND the dialog is closed.
-  const shouldHideOverlays = isMapInteracting || !!dialogZone;
+  // Overlays (Header+Greeting, HomeBottomCard) should hide whenever:
+  //   - the map is being interacted with (panning/zooming), OR
+  //   - a zone dialog is open (tapped a heatmap blob or an engineer pin), OR
+  //   - the user just tapped "Go to Map" and we're mid-exit-transition, OR
+  //   - the page hasn't finished its mount-entrance transition yet.
+  // NOTE: dialogZone was dropped from this condition in a previous edit —
+  // restored here, since without it the dialog pops open on top of overlays
+  // that don't get out of the way.
+  const shouldHideOverlays =
+    isMapInteracting || !!dialogZone || isLeavingToMap || !hasEntered;
 
   return (
     <div className="home-page">
-      <Header userName={user?.name} />
-
       <div className="home-page__map-area">
         <div className="home-page__map-fill">
           <MapView
@@ -217,24 +250,78 @@ export default function HomePage() {
           />
         </div>
 
-        // Top overlay (Greeting) — slides up, tucking behind the header
+        {/*
+          Top overlay — Header + Greeting slide/hide TOGETHER as one unit.
+          Same transform/transition driving the entrance animation (mount),
+          the map-drag hide, the dialog-open hide, and the "Go to Map" exit —
+          all just different reasons shouldHideOverlays can be true.
+        */}
         <div
           className="home-page__top-overlay"
           style={{
-            transform: shouldHideOverlays ? 'translateY(-180%)' : 'translateY(0)',
-            transition: 'transform 0.32s ease',
+            transform: shouldHideOverlays ? 'translateY(-150%)' : 'translateY(0)',
+            transition: `transform ${OVERLAY_TRANSITION_MS}ms ease`,
           }}
         >
+          <Header userName={user?.name} />
           <Greeting isEngineer={isEngineer} userName={user?.name} />
         </div>
 
+        {/*
+          Bottom overlay — UNCHANGED from its original CSS-driven position
+          (home.css presumably sets position:absolute; bottom:0 on this
+          class to float it over the map). Do not add inline `position`
+          here — see the earlier bug this caused (broke the overlay's
+          float-over-map behavior entirely).
+        */}
         <div
           className="home-page__bottom-overlay"
           style={{
             transform: shouldHideOverlays ? 'translateY(150%)' : 'translateY(0)',
-            transition: 'transform 0.32s ease',
+            transition: `transform ${OVERLAY_TRANSITION_MS}ms ease`,
           }}
         >
+          {/*
+            "Go to Map" button row — top-right, fully OUTSIDE the Nearby
+            Alerts card (not overlapping its corner like a FAB anymore),
+            with a visible gap above the card. Plain flex row in normal
+            flow, so no extra positioned wrapper is needed here — simpler
+            and safer than the earlier absolute-positioned version.
+          */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              marginBottom: 12, // the "space between them" gap
+            }}
+          >
+            <button
+              type="button"
+              onClick={handleGoToMap}
+              aria-label="Open full hazard map"
+              title="Open full hazard map"
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: '50%',
+                border: 'none',
+                background: '#ffffff',
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                flexShrink: 0,
+              }}
+            >
+              <i
+                className="fa-solid fa-map-location-dot"
+                aria-hidden="true"
+                style={{ fontSize: 18, color: '#2a6697' }}
+              />
+            </button>
+          </div>
+
           <HomeBottomCard
             alerts={nearbyAlerts}
             stats={stats}

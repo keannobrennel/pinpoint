@@ -57,6 +57,7 @@ a:root {
   background: var(--pp-white);
   border-radius: 18px;
   padding: 18px 20px 20px;
+  margin:4px 16px;
   box-shadow: 0 6px 20px rgba(1, 39, 124, 0.1);
   display: flex;
   flex-direction: column;
@@ -131,8 +132,18 @@ a:root {
   z-index: 30;
   margin:0;
   padding: 25px !important;
-  margin-bottom:10px;
-  box-shadow: 0 15px 12px -10px rgba(0, 0, 0, 0.4);
+  margin-bottom:24px;
+  /*
+    background was missing here entirely — harmless back when Header sat
+    in normal flow above a solid page background, but Header now renders
+    directly on top of the map (inside .home-page__top-overlay), so a
+    transparent header let the map show straight through it. This was
+    previously patched as an inline style directly on Header.jsx; moved
+    here instead now that we have this file, so styling stays CSS-driven
+    like the rest of the codebase.
+  */
+  background: var(--pp-white);
+  box-shadow: 0 10px 8px -3px rgba(0, 0, 0, 0.3);
 }
 
 .home-page .pinpoint-header {
@@ -162,7 +173,16 @@ a:root {
   left: 0;
   right: 0;
   z-index: 20;
-  padding: 14px 16px 0;
+  /*
+    Top padding removed (was `14px 16px 0`). That padding was written for
+    when only Greeting lived in this container — Header sat outside it, in
+    normal document flow. Header now lives INSIDE this overlay too (so it
+    can slide/hide together with Greeting), which meant it inherited that
+    14px inset from the very top of the screen, exposing the map above it.
+    Header needs to sit flush at top:0 with no gap; the 10px gap between
+    Header and Greeting still comes from .pinpoint-header's own
+    margin-bottom, so nothing else changes visually below the header.
+  */
   pointer-events: none;
 }
 

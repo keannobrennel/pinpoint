@@ -3,12 +3,16 @@
 /**
  * ZoneLegend.js
  *
- * Small fixed legend in the bottom-right corner of the map identifying the
- * three heatmap color tiers: Safe (green), Caution (amber), Dangerous (red).
+ * Small fixed legend identifying the three heatmap color tiers: Safe
+ * (green), Caution (amber), Dangerous (red).
  *
- * Pure presentational component — no props needed since the tier colors
- * are a fixed convention shared with Heatmap.js (TIER_COLOR) and
- * ZoneDetailDialog.js (TIER_CONFIG).
+ * Pure presentational component — the tier colors are a fixed convention
+ * shared with Heatmap.js (TIER_COLOR) and ZoneDetailDialog.js (TIER_CONFIG).
+ *
+ * `position` lets callers place it bottom-right (original default, used
+ * nowhere active yet) or top-right (used by the full /map page, per the
+ * map requirements — legend stays out of the way of the bottom-left
+ * filters and the bottom-right locate button).
  */
 
 const LEGEND_ITEMS = [
@@ -17,13 +21,19 @@ const LEGEND_ITEMS = [
   { label: 'Dangerous', color: '#ef4444' },
 ];
 
-export default function ZoneLegend() {
+const POSITION_STYLES = {
+  'top-right':    { top: 16, right: 16 },
+  'bottom-right': { bottom: 16, right: 16 },
+};
+
+export default function ZoneLegend({ position = 'bottom-right' }) {
+  const positionStyle = POSITION_STYLES[position] ?? POSITION_STYLES['bottom-right'];
+
   return (
     <div
       style={{
         position: 'absolute',
-        bottom: 16,
-        right: 16,
+        ...positionStyle,
         zIndex: 150,
         background: 'rgba(255, 255, 255, 0.95)',
         borderRadius: 10,

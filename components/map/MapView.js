@@ -9,9 +9,13 @@
  * - Mounts the public heatmap layer (always visible)
  * - Conditionally mounts the engineer pin layer (isEngineer === true only)
  * - Mounts DisasterZoneBanner (visible to all users when disaster zones exist)
- * - Mounts ZoneLegend (bottom-right safe/caution/dangerous key)
+ * - Mounts ZoneLegend (bottom-right safe/caution/dangerous key by default;
+ *   pass legendPosition="top-right" for the full /map page)
  * - Mounts ZoneDetailDialog, now CONTROLLED from the parent (page.js)
  * - Mounts MapController, which pans/zooms the map when `focusZone` changes
+ * - Optionally mounts BoundaryOverlay (City/Barangay polygon divisions) and
+ *   LocateButton (target icon → user's GPS position), both opt-in via props
+ *   so the home page's map is completely unaffected unless it asks for them.
  *
  * selectedZone is no longer local state — it's lifted to page.js so that
  * tapping "View More" on a NearbyAlertsPage card can open the exact same
@@ -44,6 +48,8 @@ import ZoneMarkers from './ZoneMarkers';
 import ZoneDetailDialog from './ZoneDetailDialog';
 import ZoneLegend from './ZoneLegend';
 import DisasterZoneBanner from './DisasterZoneBanner';
+import BoundaryOverlay from './BoundaryOverlay';
+import LocateButton from './LocateButton';
 
 // Public Maps key — safe to expose in the browser bundle.
 // Restrict it in Cloud Console to your Vercel domain + localhost.
@@ -384,7 +390,17 @@ function MapInteractionWatcher({ onInteractionChange }) {
  *   selectedZone: Object | null,          — Controlled: zone shown in ZoneDetailDialog
  *   onZoneSelect: (zone: Object) => void, — Fired on pin/blob tap; parent sets selectedZone
  *   onClose: () => void,                  — Fired on dialog close / map background tap
- *   focusZone: Object | null              — Controlled: zone the camera should pan/zoom to
+ *   focusZone: Object | null,             — Controlled: zone the camera should pan/zoom to
+ *   onMapInteractionChange?: (moving: boolean) => void,
+ *
+ *   --- Opt-in extras, all default to "off" so existing callers (home page)
+ *       are completely unaffected ---
+ *   showLegend?: boolean,                 — Mount ZoneLegend (default false)
+ *   legendPosition?: 'bottom-right' | 'top-right',  — default 'bottom-right'
+ *   showLocateButton?: boolean,           — Mount the GPS "target" button (default false)
+ *   cityFilter?: { code: string, name: string } | null,      — Selected city
+ *   barangayFilter?: { code: string, name: string } | null,  — Selected barangay
+ *   showBoundaries?: boolean,             — Gate for the boundary polygon overlay (default true)
  * }} props
  */
 export default function MapView({
@@ -396,7 +412,13 @@ export default function MapView({
   onZoneSelect,
   onClose,
   focusZone,
-  onMapInteractionChange
+  onMapInteractionChange,
+  showLegend = false,
+  legendPosition = 'bottom-right',
+  showLocateButton = false,
+  cityFilter = null,
+  barangayFilter = null,
+  showBoundaries = true,
 }) {
   const handleZoneSelect = useCallback(
     (zone) => {
@@ -457,10 +479,22 @@ export default function MapView({
           {/* ── Camera controller — pans/zooms on focusZone change ──────────── */}
           <MapController focusZone={focusZone} />
           <MapInteractionWatcher onInteractionChange={onMapInteractionChange} />
+
+          {/* ── City/Barangay boundary divisions — opt-in, see MapFilters.js ── */}
+          {cityFilter && showBoundaries && (
+            <BoundaryOverlay
+              cityCode={cityFilter.code}
+              barangayCode={barangayFilter?.code ?? null}
+              barangayName={barangayFilter?.name ?? null}
+            />
+          )}
+
+          {/* ── "Go to my location" target button — opt-in ──────────────────── */}
+          {showLocateButton && <LocateButton />}
         </Map>
 
         {/* ── Legend ───────────────────────────────────────────────────────── */}
-        {/* <ZoneLegend /> */}
+        {showLegend && <ZoneLegend position={legendPosition} />}
 
         {/* ── Zone Detail Dialog ───────────────────────────────────────────── */}
         {/*

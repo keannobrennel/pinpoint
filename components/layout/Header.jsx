@@ -5,16 +5,28 @@ import Link from "next/link";
 
 export default function Header() {
   return (
-    <header className="pinpoint-header">
+    <header
+      className="pinpoint-header"
+      style={{
+        // Explicit opaque background — Header now renders directly on top
+        // of the map (inside home-page__top-overlay), so any transparency
+        // in .pinpoint-header's own CSS becomes very visible (the map
+        // shows through). Setting it here guarantees a solid header
+        // regardless of what the CSS class does or doesn't define.
+        backgroundColor: '#ffffff',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+      }}
+    >
       {/* Logo */}
       <div className="header-logo">
         <Image
             src="/pinpoint-logo-pin.png"
             alt="PinPoint pin icon"
-            width={48}
-            height={48}
+            width={54}
+            height={54}
             priority
             className="logo-pin"
+            style={{ height: 'auto' }}
         />
         <div className="logo-text-wrap">
           <h1 className="logo-text">PinPoint</h1>
