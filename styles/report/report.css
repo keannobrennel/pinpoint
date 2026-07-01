@@ -13,7 +13,7 @@
 .report-content {
   flex: 1;
   overflow-y: auto;
-  padding: 96px 25px 180px 25px;
+  padding: 96px 25px 100px 25px;
   display: flex;
   flex-direction: column;
   gap: 10;
@@ -220,7 +220,7 @@
   width: 100%;
   padding: 8px 0;
   border-radius: 8px;
-  background: #f3f4f6;
+  background: #fff;
   font-size: 14px;
   font-weight: 500;
   color: #374151;
