@@ -6,7 +6,7 @@ export async function POST(request, { params }) {
   const user = await verifyAuth(request);
   if (!user) return unauthorized();
 
-  if (user.role !== "admin") {
+  if (!["admin", "engineer"].includes(user.role)) {
     return new Response(JSON.stringify({ error: "Forbidden" }), {
       status: 403,
       headers: { "Content-Type": "application/json" },
