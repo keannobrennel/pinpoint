@@ -1,0 +1,20 @@
+/* styles/tokens.css
+   Design tokens — single source of truth for all CSS variables.
+   Import first before any other PinPoint stylesheet.
+*/
+
+:root {
+  --pp-navy:        #01277C;
+  --pp-main:        #2563EB;
+  --pp-orange:      #F97316;
+  --pp-orange-dark: #d96b10;
+  --pp-white:       #ffffff;
+  --pp-bg:          #eef2fb;
+  --pp-surface:     #ffffff;
+  --pp-muted:       #7a8aab;
+  --pp-border:      #d9e2f3;
+
+  --pp-font:        "Plus Jakarta Sans";
+
+  --header-h: 125px;
+}

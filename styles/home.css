@@ -1,0 +1,338 @@
+/* styles/home.css — Home page specific styles */
+
+.home-page {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--pp-bg);
+  font-family: var(--pp-font);
+}
+
+/* ── Shared card base — greeting and nearby alerts both use this look ───── */
+
+.greeting-card,
+.nearby-alerts-page {
+  background: var(--pp-white);
+  border-radius: 18px;
+  box-shadow: 0 6px 20px rgba(1, 39, 124, 0.1);
+}
+
+/* ── Greeting card ──────────────────────────────────────────────────────── */
+
+.greeting-card {
+  position: relative;
+  margin: 0px 25px;
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 150px;
+}
+
+.greeting-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 1;
+  margin-bottom: 14px;
+}
+
+.greeting-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--pp-muted);
+  margin: 0;
+}
+
+.greeting-subtext {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--pp-navy);
+  margin: 0;
+  line-height: 1.2;
+  max-width: 58%;
+}
+
+.greeting-highlight {
+  color: var(--pp-orange);
+}
+
+.greeting-mascot {
+  position: absolute;
+  right: 0px;
+  bottom: 45px;
+  z-index: 1;
+}
+
+.report-hazard-link {
+  display: block;
+  z-index: 2;
+  position: relative;
+}
+
+.report-hazard-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: var(--pp-orange);
+  color: var(--pp-white);
+  border: none;
+  border-radius: 12px;
+  padding: 12px 0;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.report-hazard-btn:hover {
+  background: var(--pp-orange-dark);
+}
+
+/* ── Nearby Alerts card ─────────────────────────────────────────────────── */
+
+.nearby-alerts-page {
+  margin: 0px 25px 15px 25px;
+  padding: 14px 16px 16px;
+}
+
+.nearby-alerts-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.nearby-alerts-page__title {
+  margin: 0;
+  font-weight: 800;
+  font-size: 18px;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nearby-alerts-page__title-icon-wrap {
+  width: 36px;
+  height: 36px;
+  background: #FEE9D8;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nearby-alerts-page__see-all {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pp-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nearby-alerts-page__empty {
+  font-size: 13px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.nearby-alerts-page__body {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nearby-alerts-page__nav-btn {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid #e5e7eb;
+  background: var(--pp-white);
+  color: #374151;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.nearby-alerts-page__nav-btn:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.nearby-alerts-page__content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.nearby-alerts-page__icon-wrap {
+  flex-shrink: 0;
+  width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nearby-alerts-page__icon-wrap i {
+  line-height: 1;
+  transition: font-size 0.15s ease;
+}
+
+.nearby-alerts-page__info {
+  min-width: 0;
+  flex: 1;
+}
+
+.nearby-alerts-page__place {
+  font-size: 17px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nearby-alerts-page__status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.nearby-alerts-page__status {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pp-orange);
+  background: #FDEBDF;
+  border-radius: 20px;
+  padding: 3px 12px;
+  white-space: nowrap;
+}
+
+.nearby-alerts-page__posted-by {
+  font-size: 13px;
+  color: #29a742;
+  margin: 6px 0 2px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nearby-alerts-page__meta {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 2px 0 10px;
+}
+
+.nearby-alerts-page__view-more {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pp-white);
+  background: var(--pp-main);
+  border: none;
+  border-radius: 7px;
+  padding: 6px 14px;
+  margin-top: 3px;
+  cursor: pointer;
+}
+
+.nearby-alerts-page__dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.nearby-alerts-page__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: none;
+  background: #d1d5db;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.nearby-alerts-page__dot--active {
+  background: var(--pp-main);
+  transform: scale(1.3);
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+
+.pinpoint-header {
+  flex-shrink: 0;
+  z-index: 30;
+  margin: 0;
+  padding: 40px 25px 15px 25px;
+  margin-bottom: 5px;
+  background: var(--pp-bg);
+}
+
+.home-page .pinpoint-header {
+  position: relative;
+}
+
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+
+.home-page__map-area {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.home-page__map-fill {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.home-page__top-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.home-page__top-overlay > * {
+  pointer-events: auto;
+}
+
+.home-page__bottom-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 92px;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.home-page__bottom-overlay > * {
+  pointer-events: auto;
+}

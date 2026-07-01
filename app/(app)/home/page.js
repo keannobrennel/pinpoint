@@ -8,9 +8,9 @@ import { useZones } from "@/hooks/useZones";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import Header from "@/components/layout/Header";
 import Greeting from "@/components/home/Greeting";
-import HomeBottomCard from "@/components/home/HomeBottomCard";
+import NearbyAlertsPage from "@/components/home/NearbyAlertsPage";
 import MapView from "@/components/map/MapView";
-import "@/styles/(app)/home.css";
+import "@/styles/home.css";
 
 // Duration of the overlay slide transform — kept as a named constant so the
 // "wait for the animation to finish, THEN navigate" timeout below can never
@@ -292,7 +292,7 @@ export default function HomePage() {
             style={{
               display: 'flex',
               justifyContent: 'flex-end',
-              marginBottom: 12, // the "space between them" gap
+              margin: '0 16px 12px', // horizontal matches card margin; bottom is the gap above the card
             }}
           >
             <button
@@ -322,7 +322,7 @@ export default function HomePage() {
             </button>
           </div>
 
-          <HomeBottomCard
+          <NearbyAlertsPage
             alerts={nearbyAlerts}
             stats={stats}
             isEngineer={isEngineer}
