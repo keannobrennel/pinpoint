@@ -22,7 +22,9 @@ async function ensureUserDoc(user) {
       role: "public",
       createdAt: new Date().toISOString(),
     });
+    return "public";
   }
+  return snap.data()?.role ?? "public";
 }
 
 export default function LoginPage() {
@@ -37,8 +39,8 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const { user } = await signInWithPopup(auth, new GoogleAuthProvider());
-      await ensureUserDoc(user);
-      router.push("/home");
+      const role = await ensureUserDoc(user);
+      router.push(role === "admin" ? "/admin" : "/home");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -52,8 +54,8 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const { user } = await signInWithEmailAndPassword(auth, email, password);
-      await ensureUserDoc(user);
-      router.push("/home");
+      const role = await ensureUserDoc(user);
+      router.push(role === "admin" ? "/admin" : "/home");
     } catch (err) {
       setError(err.message);
     } finally {
