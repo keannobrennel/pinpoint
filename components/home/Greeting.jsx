@@ -14,14 +14,14 @@ export default function Greeting({ isEngineer, userName }) {
       </div>
 
       <div className="greeting-mascot">
-        <Image src="/images/chick1.png" alt="" width={180} height={180} priority />
+        <Image src="/images/chick1.png" alt="" width={220} height={220} priority />
       </div>
 
       <Link href="/report/new" className="report-hazard-link">
         <button className="report-hazard-btn">
           <i className="fa-regular fa-camera fa-xl"></i>
           Report Hazard
-          </button>
+        </button>
       </Link>
     </div>
   );

@@ -182,7 +182,7 @@
   left: 0;
   right: 0;
   padding: 16px 25px 32px;
-  background: var(--pp-white);
+  background: var(--pp-bg);
   border-top: 1px solid var(--pp-border);
   display: flex;
   flex-direction: column;

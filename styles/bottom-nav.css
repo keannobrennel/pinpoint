@@ -88,7 +88,7 @@
 }
 
 .fab-camera {
-  width: 60px;
+  height: 100%;
   aspect-ratio: 1/1;
   border-radius: 50%;
   background: linear-gradient(135deg, #3474FF, #1E51A9);

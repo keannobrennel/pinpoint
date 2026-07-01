@@ -1,6 +1,8 @@
 /* styles/home.css — Home page specific styles */
 
 .home-page {
+  display: flex;
+  flex-direction: column;
   position: relative;
   width: 100%;
   height: 100%;
@@ -9,32 +11,21 @@
   font-family: var(--pp-font);
 }
 
-/* Override app-shell constraints for full-bleed map */
-.app-shell {
-  align-items: stretch !important;
-}
+/* ── Shared card base — greeting and nearby alerts both use this look ───── */
 
-.app-content {
-  width: 100% !important;
-}
-
-.home-page {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  font-family: var(--pp-font);
-}
-
-/* Greetings CSS */
-.greeting-card {
-  position: relative;
+.greeting-card,
+.nearby-alerts-page {
   background: var(--pp-white);
   border-radius: 18px;
-  padding: 18px 20px 20px;
-  margin:4px 16px;
   box-shadow: 0 6px 20px rgba(1, 39, 124, 0.1);
+}
+
+/* ── Greeting card ──────────────────────────────────────────────────────── */
+
+.greeting-card {
+  position: relative;
+  margin: 4px 16px;
+  padding: 18px 20px 20px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -71,8 +62,8 @@
 
 .greeting-mascot {
   position: absolute;
-  right: 32px;
-  bottom: 55px;   /* sits above the button */
+  right: 0px;
+  bottom: 45px;
   z-index: 1;
 }
 
@@ -102,21 +93,186 @@
 .report-hazard-btn:hover {
   background: var(--pp-orange-dark);
 }
-/* Header stays in normal flow with solid background */
+
+/* ── Nearby Alerts card ─────────────────────────────────────────────────── */
+
+.nearby-alerts-page {
+  padding: 14px 16px 16px;
+}
+
+.nearby-alerts-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.nearby-alerts-page__title {
+  margin: 0;
+  font-weight: 800;
+  font-size: 18px;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nearby-alerts-page__title-icon-wrap {
+  width: 36px;
+  height: 36px;
+  background: #FEE9D8;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nearby-alerts-page__see-all {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pp-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nearby-alerts-page__empty {
+  font-size: 13px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.nearby-alerts-page__body {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nearby-alerts-page__nav-btn {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid #e5e7eb;
+  background: var(--pp-white);
+  color: #374151;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.nearby-alerts-page__nav-btn:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.nearby-alerts-page__content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.nearby-alerts-page__icon-wrap {
+  flex-shrink: 0;
+  width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nearby-alerts-page__icon-wrap i {
+  line-height: 1;
+  transition: font-size 0.15s ease;
+}
+
+.nearby-alerts-page__info {
+  min-width: 0;
+  flex: 1;
+}
+
+.nearby-alerts-page__place {
+  font-size: 17px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nearby-alerts-page__status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.nearby-alerts-page__status {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pp-orange);
+  background: #FDEBDF;
+  border-radius: 20px;
+  padding: 3px 12px;
+  white-space: nowrap;
+}
+
+.nearby-alerts-page__posted-by {
+  font-size: 13px;
+  color: #29a742;
+  margin: 6px 0 2px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nearby-alerts-page__meta {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 2px 0 10px;
+}
+
+.nearby-alerts-page__view-more {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pp-white);
+  background: var(--pp-main);
+  border: none;
+  border-radius: 7px;
+  padding: 6px 14px;
+  margin-top: 3px;
+  cursor: pointer;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+
 .pinpoint-header {
   flex-shrink: 0;
   z-index: 30;
-  margin:0;
+  margin: 0;
   padding: 40px 25px 15px 25px;
-  margin-bottom:16px;
+  margin-bottom: 16px;
   background: var(--pp-bg);
 }
 
 .home-page .pinpoint-header {
-  position: relative;  /* back to normal flow */
+  position: relative;
 }
 
-/* Everything below the header — map fills this area */
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+
 .home-page__map-area {
   position: relative;
   flex: 1;
@@ -124,30 +280,18 @@
   width: 100%;
 }
 
-/* Map is absolute, fills the entire map-area */
 .home-page__map-fill {
   position: absolute;
   inset: 0;
   z-index: 0;
 }
 
-/* Greeting floats top of map-area */
 .home-page__top-overlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   z-index: 20;
-  /*
-    Top padding removed (was `14px 16px 0`). That padding was written for
-    when only Greeting lived in this container — Header sat outside it, in
-    normal document flow. Header now lives INSIDE this overlay too (so it
-    can slide/hide together with Greeting), which meant it inherited that
-    14px inset from the very top of the screen, exposing the map above it.
-    Header needs to sit flush at top:0 with no gap; the 10px gap between
-    Header and Greeting still comes from .pinpoint-header's own
-    margin-bottom, so nothing else changes visually below the header.
-  */
   pointer-events: none;
 }
 
@@ -155,7 +299,6 @@
   pointer-events: auto;
 }
 
-/* BottomCard floats bottom of map-area */
 .home-page__bottom-overlay {
   position: absolute;
   left: 0;
