@@ -1,6 +1,7 @@
 // app/(detail)/profile/page.js
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
@@ -18,6 +19,8 @@ function getInitial(name) {
 export default function ProfilePage() {
   const router = useRouter();
   const { user, role } = useAuth();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState(null);
 
   // Same field-name assumptions as Header.jsx — keep these two in sync if
   // your useAuth hook's user shape changes.
@@ -27,14 +30,18 @@ export default function ProfilePage() {
   const initial = getInitial(displayName);
 
   const handleSignOut = async () => {
+    if (isSigningOut) return; // guard against double-clicks
+    setIsSigningOut(true);
+    setSignOutError(null);
     try {
       await signOut(auth);
       router.replace("/login");
     } catch (err) {
       console.error("[ProfilePage] sign out failed:", err);
+      setSignOutError("Sign out failed. Please try again.");
+      setIsSigningOut(false);
     }
   };
-
 
   return (
     <div className="detail-screen">
@@ -112,12 +119,18 @@ export default function ProfilePage() {
 
       {/* Action button */}
       <div className="detail-screen__footer">
+        {signOutError ? (
+          <p className="profile-page__signout-error" role="alert">
+            {signOutError}
+          </p>
+        ) : null}
         <button
           type="button"
           className="detail-screen__action-btn detail-screen__action-btn--danger"
           onClick={handleSignOut}
+          disabled={isSigningOut}
         >
-          Sign Out
+          {isSigningOut ? "Signing out..." : "Sign Out"}
         </button>
       </div>
     </div>
