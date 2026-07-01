@@ -93,7 +93,7 @@ export async function POST(request) {
     status: isAutoVerifier ? "auto_verified" : "pending",
     verificationStatus: isAutoVerifier ? "verified_true" : "unverified",
     verifiedBy: isAutoVerifier ? user.uid : null,
-    verifiedByName: isAutoVerifier ? (user.displayName ?? null) : null,
+    verifiedByName: isAutoVerifier ? (user.displayName ?? user.email) : null,
     verifiedByRole: isAutoVerifier ? user.role : null,
     verifiedAt: isAutoVerifier ? now : null,
     responderNote: null,

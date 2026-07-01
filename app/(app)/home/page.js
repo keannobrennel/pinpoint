@@ -192,6 +192,12 @@ export default function HomePage() {
   // index changes — independent of whether the dialog is open or closed.
   const focusZone = nearbyAlerts[activeAlertIndex] ?? null;
 
+  // Overlays (Greeting + NearbyAlerts/HomeBottomCard) should hide whenever
+  // the map is being interacted with (panning/zooming) OR a zone dialog is
+  // open (tapped a heatmap blob or an engineer pin). They come back once
+  // both are false — i.e. the map settles AND the dialog is closed.
+  const shouldHideOverlays = isMapInteracting || !!dialogZone;
+
   return (
     <div className="home-page">
       <Header userName={user?.name} />
@@ -215,7 +221,7 @@ export default function HomePage() {
         <div
           className="home-page__top-overlay"
           style={{
-            transform: isMapInteracting ? 'translateY(-150%)' : 'translateY(0)',
+            transform: shouldHideOverlays ? 'translateY(-180%)' : 'translateY(0)',
             transition: 'transform 0.32s ease',
           }}
         >
@@ -225,7 +231,7 @@ export default function HomePage() {
         <div
           className="home-page__bottom-overlay"
           style={{
-            transform: isMapInteracting ? 'translateY(150%)' : 'translateY(0)',
+            transform: shouldHideOverlays ? 'translateY(150%)' : 'translateY(0)',
             transition: 'transform 0.32s ease',
           }}
         >

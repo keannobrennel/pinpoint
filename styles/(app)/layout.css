@@ -48,17 +48,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 15px 25px 15px 25px !important;
-/* Bigger, softer, and more prominent */
-  /* Bigger, softer, and more prominent */
-  box-shadow: 0 15px 12px -10px rgba(155, 154, 154, 0.4);
+  margin: 40px 30px 25px 30px;
 }
 
 /* Logo group */
 .header-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
 }
 
 .logo-pin {
@@ -69,20 +66,21 @@
 .logo-text-wrap {
   display: flex;
   flex-direction: column;
-  gap: 1px;
 }
 
 .logo-text {
-  object-fit: contain;
-  margin-bottom: 3;
+  margin-bottom: 4px;
+  font-size: 30px;
+  color: #2563EB;
+  font-weight: 900;
+  line-height: 1.1;
+  text-shadow: 0 2px 4px rgba(37, 99, 235, 0.4);
 }
 
 .logo-tagline {
   font-size: 12px;
   color: var(--pp-muted);
-  letter-spacing: 0.02em;
-  line-height: 1;
-  margin-left: 3;
+  margin-top: -3px;
 }
 
 /* Avatar button */
@@ -122,9 +120,11 @@
   position: fixed;
   bottom: 0;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  margin: 20px 25px;
-  width: 90%;
+  margin: 20 30 20 30;
+  right: 0;
+  left: 0;
   z-index: 100;
   height: 8%;
   gap: 17;
@@ -160,7 +160,7 @@
 }
 
 .bottom-nav__link--active {
-  color: #2457C5;
+  color: #2563EB;
 }
 
 .bottom-nav__icon-wrap {
@@ -204,10 +204,10 @@
 
 /* ── FAB (floating camera button) ───────────────────────── */
 .fab-camera {
-  width: 71px;
-  height: 100%;
+  width: 65px;
+  aspect-ratio: 1/1;
   border-radius: 50%;
-  background: linear-gradient(135deg, #1E51A9, #3474FF);
+  background: linear-gradient(135deg, #3474FF, #1E51A9);
   color: var(--pp-white);
   display: flex;
   align-items: center;
@@ -218,8 +218,8 @@
 
 .fab-camera:hover,
 .fab-camera:focus-visible {
-  background: var(--pp-orange);
-  transform: scale(1.06);
+  background: var(--pp-navy);
+  transform: scale(1.03);
   outline: none;
 }
 
