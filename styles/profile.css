@@ -1,0 +1,55 @@
+/* styles/profile.css
+   Profile-page-only styles. Layout, header, cards, and the action button
+   now come from styles/detail.css (ScreenHeader, .detail-screen,
+   .detail-screen__card, .detail-screen__footer, .detail-screen__action-btn).
+   This file only covers what's unique to the profile screen: the avatar.
+*/
+
+.profile-page__avatar-card {
+  align-items: center;
+  text-align: center;
+}
+
+.profile-page__avatar-image {
+  border-radius: 50%;
+  object-fit: cover;
+  width: 96px;
+  height: 96px;
+}
+
+.profile-page__avatar-fallback {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--pp-main);
+  color: var(--pp-white);
+  font-size: 36px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-page__name {
+  margin: 4px 0 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--pp-navy);
+}
+
+.profile-page__role-badge {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--pp-main);
+  background: rgba(42, 102, 151, 0.1);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+/* Sign-out uses the shared action-btn but needs a destructive treatment */
+.detail-screen__action-btn--danger {
+  background: #fdecec;
+  color: #c0392b;
+}
