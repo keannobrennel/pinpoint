@@ -17,6 +17,7 @@ export async function POST(request) {
     barangay,
     zoneId,
     description,
+    mode, // "pre_disaster" | "post_disaster"
   } = body;
 
   if (!base64Image || !location) {
@@ -26,8 +27,15 @@ export async function POST(request) {
     });
   }
 
-  // Run Gemini Vision analysis
-  const aiAssessment = await analyzeHazardPhoto(base64Image, mimeType);
+  const reportMode = mode === "pre_disaster" ? "pre_disaster" : "post_disaster";
+
+  // Run Gemini Vision analysis using the mode-appropriate framework
+  // (FEMA P-154 for pre-disaster screening, ATC-20 for post-disaster).
+  const aiAssessment = await analyzeHazardPhoto(
+    base64Image,
+    mimeType,
+    reportMode,
+  );
 
   if (!aiAssessment.isValidHazard) {
     return new Response(
@@ -71,9 +79,6 @@ export async function POST(request) {
     new Date(),
   );
 
-  // Responders and admins auto-verify their own submissions — they skip
-  // the queue entirely by design (spec section 1.3 covers responders;
-  // extending the same trust to admin since they're top of the role chain).
   const isAutoVerifier =
     user.role === "responder" ||
     user.role === "admin" ||
@@ -82,6 +87,7 @@ export async function POST(request) {
 
   const report = {
     submittedBy: user.uid,
+    mode: reportMode,
     imageUrl,
     location,
     city: city ?? null,
