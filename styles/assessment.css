@@ -1,0 +1,404 @@
+/* styles/assessment.css
+   Structural Assessment wizard (Part 1-3) and result screen.
+   Extends detail.css patterns (detail-screen, detail-screen__card,
+   detail-screen__footer, detail-screen__action-btn).
+*/
+
+/* ── Incident context banner ── */
+.assessment-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.assessment-banner__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.assessment-banner__number {
+  font-size: 12px;
+  color: var(--pp-muted);
+  font-weight: 600;
+}
+
+.assessment-banner__title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--pp-navy);
+  line-height: 1.25;
+}
+
+.assessment-banner__location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--pp-muted);
+}
+
+.assessment-banner__location i {
+  font-size: 11px;
+}
+
+/* ── Step progress ── */
+.assessment-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 0 8px;
+}
+
+.assessment-progress__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pp-muted);
+}
+
+.assessment-progress__track {
+  height: 6px;
+  border-radius: 4px;
+  background: var(--pp-border);
+  overflow: hidden;
+}
+
+.assessment-progress__fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--pp-main);
+  transition: width 0.2s ease;
+}
+
+/* ── Section / subsection headers ── */
+.assessment-section-header {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--pp-main);
+  letter-spacing: 0.3px;
+  margin: 8px 0 4px;
+}
+
+.assessment-subsection-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pp-navy);
+  margin: 6px 0 -2px;
+}
+
+/* ── Form fields ── */
+.assessment-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.assessment-field__label {
+  font-size: 12px;
+  color: var(--pp-muted);
+  font-weight: 500;
+}
+
+.assessment-field__hint {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--pp-muted);
+}
+
+.assessment-field__static {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--pp-navy);
+}
+
+.assessment-field__input,
+.assessment-field__textarea {
+  width: 100%;
+  border: 1.5px solid var(--pp-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  font-family: var(--pp-font);
+  color: var(--pp-navy);
+  background: var(--pp-white);
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.assessment-field__input:focus,
+.assessment-field__textarea:focus {
+  outline: none;
+  border-color: var(--pp-main);
+}
+
+.assessment-field__textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+/* ── Recommended action options ── */
+.assessment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.assessment-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--pp-border);
+  background: var(--pp-white);
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--pp-font);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.assessment-option--selected {
+  border-color: var(--pp-main);
+  background: #eef4ff;
+}
+
+.assessment-option__radio {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--pp-border);
+  background: var(--pp-white);
+  position: relative;
+}
+
+.assessment-option__radio--selected {
+  border-color: var(--pp-main);
+}
+
+.assessment-option__radio--selected::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--pp-main);
+}
+
+.assessment-option__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pp-navy);
+}
+
+.assessment-note {
+  background: #eaf2ff;
+  border: 1px solid #cfe0fb;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 11.5px;
+  color: #3a5a8a;
+  line-height: 1.5;
+}
+
+/* ── Header info icon ── */
+.assessment-info-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--pp-main);
+  cursor: pointer;
+  padding: 0;
+}
+
+.assessment-info-btn i {
+  font-size: 18px;
+}
+
+/* ── Footer row variant (Cancel / Next side-by-side) ── */
+.detail-screen__footer--row {
+  flex-direction: row;
+}
+
+.detail-screen__footer--row .detail-screen__action-btn {
+  flex: 1;
+}
+
+/* ── Result screen ── */
+.assessment-result {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.assessment-result__mascot-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.assessment-result__mascot {
+  object-fit: contain;
+}
+
+.assessment-result__title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--pp-main);
+  margin-bottom: 4px;
+}
+
+.assessment-result__highlight {
+  font-weight: 700;
+  color: var(--pp-navy);
+}
+
+/* ── Radio pill group (Previous Posting, Areas Inspected) ── */
+.radio-pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ── Checkbox group (Facility Type, Further Actions) ── */
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.checkbox-group__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.checkbox-group__other-input {
+  margin-top: 2px;
+}
+
+/* ── Severity matrix (Condition Observed x None/Minor/Moderate/Severe) ── */
+.severity-matrix {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.severity-matrix__header,
+.severity-matrix__row {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(4, 0.6fr);
+  align-items: center;
+  gap: 4px;
+}
+
+.severity-matrix__header {
+  align-items: end;
+  padding-bottom: 4px;
+}
+
+.severity-matrix__header-cell {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--pp-muted);
+  text-align: center;
+}
+
+.severity-matrix__row {
+  padding: 8px 0;
+  border-top: 1px solid var(--pp-border);
+}
+
+.severity-matrix__row-label {
+  font-size: 12px;
+  color: var(--pp-navy);
+  font-weight: 500;
+  line-height: 1.3;
+  padding-right: 6px;
+}
+
+.severity-matrix__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.severity-matrix__radio {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--pp-border);
+  background: var(--pp-white);
+  position: relative;
+}
+
+.severity-matrix__radio--selected {
+  border-color: var(--pp-main);
+}
+
+.severity-matrix__radio--selected::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--pp-main);
+}
+
+/* ── Verdict card (Form B Part 3) — extends .assessment-option ── */
+.verdict-card--static {
+  cursor: default;
+}
+
+.verdict-card__chip {
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  border-radius: 50%;
+}
+
+/* Hex values match StatusBadge's --verified/--pending/--unsafe in badges.css */
+.verdict-card__chip--green { background: #22c55e; }
+.verdict-card__chip--amber { background: #f59e0b; }
+.verdict-card__chip--red   { background: #ef4444; }
+
+.verdict-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.verdict-card__description {
+  font-size: 11.5px;
+  color: var(--pp-muted);
+}
+
+/* ── Assessment review card (Review step + Assessment Summary page) ── */
+.assessment-review-card {
+  gap: 4px;
+}
+
+.assessment-review-card__section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+  margin-top: 4px;
+  border-top: 1px solid var(--pp-border);
+}
+
+.assessment-review-card__section:first-of-type {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
