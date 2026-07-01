@@ -12,7 +12,7 @@ const PAGE_TITLES = {
   "/admin/users": "Users",
 };
 
-export default function AdminHeader({ onMenuToggle }) {
+export default function AdminHeader() {
   const { user, role } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -49,15 +49,6 @@ export default function AdminHeader({ onMenuToggle }) {
 
   return (
     <header className="admin-header">
-      <button
-        type="button"
-        className="admin-header__menu-btn"
-        onClick={onMenuToggle}
-        aria-label="Open navigation menu"
-      >
-        <i className="fa-solid fa-bars" aria-hidden="true" />
-      </button>
-
       <div className="admin-header__brand">
         <div className="admin-header__brand-mark">
           <Image src="/pinpoint-logo-pin.png" alt="PinPoint logo" width={32} height={32} priority />

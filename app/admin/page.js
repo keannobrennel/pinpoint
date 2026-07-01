@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { adminFetch } from "@/lib/admin-api";
 import ZoneDisasterToggle from "@/components/admin/ZoneDisasterToggle";
 
@@ -111,6 +112,15 @@ export default function AdminDashboardPage() {
             Overview <em>at a Glance</em>
           </p>
           <p className="admin-glance-card__subtitle">As of today, {asOfTime}</p>
+        </div>
+        <div className="admin-glance-card__art">
+          <Image
+            src="/images/chick1.png"
+            alt="Safety inspector illustration"
+            width={150}
+            height={150}
+            priority
+          />
         </div>
       </div>
 
