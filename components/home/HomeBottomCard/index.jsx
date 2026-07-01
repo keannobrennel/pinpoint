@@ -6,13 +6,28 @@ import OverviewPage from "./OverviewPage";
 
 const pages = [NearbyAlertsPage, OverviewPage];
 
-export default function HomeBottomCard({ alerts, stats, isEngineer }) {
+export default function HomeBottomCard({
+  alerts,
+  stats,
+  isEngineer,
+  activeAlertIndex,
+  onAlertIndexChange,
+  onViewMore,
+}) {
   const [pageIndex, setPageIndex] = useState(0);
   const ActivePage = pages[pageIndex];
 
   return (
     <div className="home-bottom-card">
-      <ActivePage alerts={alerts} stats={stats} isEngineer={isEngineer} />
+      <ActivePage
+        alerts={alerts}
+        stats={stats}
+        isEngineer={isEngineer}
+        // Only used by NearbyAlertsPage — OverviewPage ignores these.
+        activeIndex={activeAlertIndex}
+        onIndexChange={onAlertIndexChange}
+        onViewMore={onViewMore}
+      />
 
       {/* dots indicator */}
       <div className="dots">

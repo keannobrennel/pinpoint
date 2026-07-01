@@ -15,6 +15,11 @@ const PENDING_PHOTO_KEY = "pendingReportPhoto";
 //   public:    Home, Community
 //   responder: Home, Community, Reports
 //   engineer:  Home, Community, Reports, Incidents
+//
+// NOTE: /map deliberately has NO tab here. It's reached via a circle
+// button on app/(app)/home/page.js (top-left of the Nearby Alerts card)
+// instead — see that file's "Go to Map" button. This nav is otherwise
+// unchanged from before that feature was added.
 const ALL_NAV_ITEMS = [
   { href: "/home",      label: "Home",      icon: "fa-solid fa-house",                  roles: ["public", "responder", "engineer"] },
   { href: "/community", label: "Community", icon: "fa-solid fa-bullhorn",               roles: ["public", "responder", "engineer"] },
@@ -59,7 +64,16 @@ export default function BottomNav() {
   // keeps the nav slot empty for that brief moment.
   if (loading) return null;
 
-  const NAV_ITEMS = ALL_NAV_ITEMS.filter((item) => item.roles.includes(role));
+  // useAuth() returns role === null for a logged-out/anonymous visitor —
+  // it only ever resolves to "citizen"/"engineer"/"admin" once a user is
+  // signed in, never the literal string "public". Every route this nav
+  // previously rendered on sat behind useAuthGuard, so role was never
+  // actually null by the time we got here — that's no longer true now
+  // that /map (public + anonymous-friendly) renders this too. Without this
+  // fallback, role=null matches none of the "public" entries below and the
+  // whole nav silently renders empty (just the floating camera FAB).
+  const effectiveRole = role ?? "public";
+  const NAV_ITEMS = ALL_NAV_ITEMS.filter((item) => item.roles.includes(effectiveRole));
 
   return (
     <>
