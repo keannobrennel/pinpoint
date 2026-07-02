@@ -11,6 +11,11 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata = {
   title: "PinPoint",
   description: "Crowdsourced infrastructure hazard reporting",
+  icons: {
+    icon: "/pinpoint-logo-pin.png",
+    shortcut: "/pinpoint-logo-pin.png",
+    apple: "/pinpoint-logo-pin.png",
+  },
 };
 
 export default function RootLayout({ children }) {

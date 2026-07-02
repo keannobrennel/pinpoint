@@ -34,7 +34,7 @@ export default function Greeting({ userName }) {
 
       <Link href="/report" className="report-hazard-link">
         <button className="report-hazard-btn">
-          <i className="fa-regular fa-camera fa-xl"></i>
+          <i className="fa-solid fa-camera fa-lg"></i>
           Report Hazard
         </button>
       </Link>

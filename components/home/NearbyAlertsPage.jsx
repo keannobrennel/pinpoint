@@ -142,23 +142,15 @@ export default function NearbyAlertsPage({
                 {current.placeName ?? 'Unnamed location'}
               </p>
 
-              {current.postedBy && (
+              {/* {current.postedBy && (
                 <p className="nearby-alerts-page__posted-by">
                   <i className="fa-solid fa-circle-check"></i>
                   {current.postedBy}
                 </p>
-              )}
+              )} */}
 
               {metaText && <p className="nearby-alerts-page__meta">{metaText}</p>}
 
-              {/*
-                Action row — "Go to" flies the map to this exact alert's
-                location without changing the carousel index or opening the
-                dialog (that's what View More is for). Same width as View
-                More via the shared .nearby-alerts-page__actions flex row
-                (flex: 1 on both buttons) rather than a fixed pixel width,
-                so they stay evenly matched at any card size.
-              */}
               <div className="nearby-alerts-page__actions">
                 <button
                   type="button"

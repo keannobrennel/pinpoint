@@ -36,12 +36,12 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  z-index: 1;
+  z-index: 2;
   margin-bottom: 14px;
 }
 
 .greeting-text {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   color: var(--pp-muted);
   margin: 0;
@@ -87,8 +87,8 @@
   border: none;
   border-radius: 12px;
   padding: 12px 0;
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 19px;
+  font-weight: 500;
   cursor: pointer;
   transition: background 0.15s;
 }
@@ -108,8 +108,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
-  padding-bottom: 10px;
+  margin-bottom: 10px;
+  padding-bottom: 7px;
   border-bottom: 1px solid #e5e7eb;
 }
 
@@ -243,7 +243,7 @@
 .nearby-alerts-page__meta {
   font-size: 12px;
   color: #6b7280;
-  margin: 2px 0 10px;
+  margin: 0 0 10px;
 }
 
 .nearby-alerts-page__actions {
@@ -284,8 +284,8 @@
 }
 
 .nearby-alerts-page__dot {
-  width: 7px;
-  height: 7px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   border: none;
   background: #d1d5db;

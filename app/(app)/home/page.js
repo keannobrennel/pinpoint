@@ -337,8 +337,8 @@ export default function HomePage() {
               aria-label="Open full hazard map"
               title="Open full hazard map"
               style={{
-                width: 44,
-                height: 44,
+                width: 54,
+                height: 54,
                 borderRadius: '50%',
                 border: 'none',
                 background: '#ffffff',
@@ -353,7 +353,7 @@ export default function HomePage() {
               <i
                 className="fa-solid fa-map-location-dot"
                 aria-hidden="true"
-                style={{ fontSize: 18, color: '#2a6697' }}
+                style={{ fontSize: 22, color: '#2563EB' }}
               />
             </button>
           </div>
