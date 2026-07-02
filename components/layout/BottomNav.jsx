@@ -21,10 +21,10 @@ const PENDING_PHOTO_KEY = "pendingReportPhoto";
 // instead — see that file's "Go to Map" button. This nav is otherwise
 // unchanged from before that feature was added.
 const ALL_NAV_ITEMS = [
-  { href: "/home",      label: "Home",      icon: "fa-solid fa-house",                  roles: ["public", "responder", "engineer"] },
-  { href: "/community", label: "Community", icon: "fa-solid fa-bullhorn",               roles: ["public", "responder", "engineer"] },
-  { href: "/reports",   label: "Reports",   icon: "fa-solid fa-file-lines",             roles: ["responder"] },
-  { href: "/incidents", label: "Incidents", icon: "fa-solid fa-triangle-exclamation",   roles: ["engineer"] },
+  { href: "/home",      label: "Home",      icon: "fa-solid fa-house",                  roles: ["public", "responder", "engineer", "admin"] },
+  { href: "/community", label: "Community", icon: "fa-solid fa-bullhorn",               roles: ["public", "responder", "engineer", "admin"] },
+  { href: "/reports",   label: "Reports",   icon: "fa-solid fa-file-lines",             roles: ["responder", "admin"] },
+  { href: "/incidents", label: "Incidents", icon: "fa-solid fa-triangle-exclamation",   roles: ["engineer", "admin"] },
 ];
 
 export default function BottomNav() {
