@@ -45,7 +45,7 @@ export default function ViewAssessmentPage({ params }) {
           router.back() is correct here, unlike the wizard's pinned <-. */}
       <ScreenHeader
         title="Assessment Summary"
-        onBack={() => router.back()}
+        onBack={() => router.push(`/incidents/${incidentId}`)}
         action={
           <button
             type="button"

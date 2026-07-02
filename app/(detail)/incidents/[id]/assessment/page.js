@@ -16,6 +16,7 @@ import SeverityMatrix from "@/components/assessment/SeverityMatrix";
 import VerdictCard from "@/components/assessment/VerdictCard";
 import AssessmentReviewCard from "@/components/assessment/AssessmentReviewCard";
 import AssessmentResult from "@/components/assessment/AssessmentResult";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { getMockIncident } from "@/lib/mock-incidents";
 import {
   RECOMMENDED_ACTIONS,
@@ -77,6 +78,8 @@ const INITIAL_FORM_B = {
   occupantsAffected: "",
   occupantsBreakdown: "",
 };
+
+
 
 // ── Review-step helpers ──
 // Build the same section/row shape AssessmentReviewCard expects, straight
@@ -222,6 +225,7 @@ export default function AssessmentPage({ params }) {
   const [step, setStep] = useState(initialStep);
   const [formA, setFormA] = useState(INITIAL_FORM_A);
   const [formB, setFormB] = useState(INITIAL_FORM_B);
+  const [showQuitConfirm, setShowQuitConfirm] = useState(false);
 
   if (status !== "ready") return null;
 
@@ -239,7 +243,25 @@ export default function AssessmentPage({ params }) {
 
   // The `<-` arrow is hard-wired to Incident Details on every wizard
   // screen — never router.back().
-  const handleBackArrow = () => router.push(`/incidents/${incidentId}`);
+  // The `<-` arrow is pinned to Incident Details — never router.back(),
+    // since this route is entered from several places and history depth
+    // isn't reliable. Mid-assessment, it discards unsaved progress, so it's
+    // gated behind a confirm modal; once finished there's nothing left to
+    // lose, so it goes straight through.
+    const handleBackArrow = () => {
+    if (isFinished) {
+        router.push(`/incidents/${incidentId}`);
+    } else {
+        setShowQuitConfirm(true);
+    }
+    };
+
+    const confirmQuit = () => {
+    setShowQuitConfirm(false);
+    router.push(`/incidents/${incidentId}`);
+    };
+
+    const cancelQuit = () => setShowQuitConfirm(false);
 
   // "Cancel" always exits the wizard back to the incident (Part 1 only) —
   // it's a different action from "Back" / "Go Back", which move within
@@ -264,6 +286,15 @@ export default function AssessmentPage({ params }) {
 
   return (
     <div className={`detail-screen${isReview || isFinished ? " detail-screen--stacked-footer" : ""}`}>
+        <ConfirmDialog
+        open={showQuitConfirm}
+        title="Quit Assessment?"
+        message="Your progress on this assessment will not be saved."
+        confirmLabel="Quit"
+        cancelLabel="Keep Editing"
+        onConfirm={confirmQuit}
+        onCancel={cancelQuit}
+        />
       <ScreenHeader
         title="Structural Assessment"
         onBack={handleBackArrow}
