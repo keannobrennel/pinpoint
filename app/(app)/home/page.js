@@ -6,10 +6,12 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useZones } from "@/hooks/useZones";
 import Header from "@/components/layout/Header";
+import BottomNav from "@/components/layout/BottomNav";
 import Greeting from "@/components/home/Greeting";
 import NearbyAlertsPage from "@/components/home/NearbyAlertsPage";
 import MapView from "@/components/map/MapView";
 import "@/styles/home.css";
+import "@/styles/bottom-nav.css";
 
 // Duration of the overlay slide transform — kept as a named constant so the
 // "wait for the animation to finish, THEN navigate" timeout below can never
@@ -367,6 +369,17 @@ export default function HomePage() {
           />
         </div>
       </div>
+
+      {/*
+        Fixed bottom nav — sibling of .home-page__map-area, not a child of
+        it. bottom-nav.css positions it with position:fixed so its own
+        placement in the DOM tree doesn't matter for layout, but it needs
+        to actually be rendered somewhere: previously it wasn't rendered
+        on /home at all (layout.js skips wrapping /home in app-shell,
+        so home is fully responsible for supplying its own nav). That's
+        why .home-page__bottom-overlay had nothing real to sit above.
+      */}
+      <BottomNav />
     </div>
   );
 }

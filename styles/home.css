@@ -301,17 +301,27 @@
 
 /* ── Header ─────────────────────────────────────────────────────────────── */
 
-.pinpoint-header {
+/*
+  This is the ONLY place that positions .pinpoint-header on /home.
+  header.css intentionally leaves position/z-index unset so there's no
+  competing declaration — previously both files set z-index on the same
+  0-1-0-specificity selector and the winner depended on import order,
+  which caused the header to render on top of (rather than above-in-flow-
+  of) the Greeting card.
+
+  position: relative (not fixed) is deliberate: this header lives INSIDE
+  .home-page__top-overlay, in normal flow, so .home-page__greeting-wrap
+  right after it starts below the header's rendered height instead of
+  both stacking at top:0.
+*/
+.home-page .pinpoint-header {
+  position: relative;
   flex-shrink: 0;
   z-index: 30;
   margin: 0;
   padding: 40px 25px 15px 25px;
   margin-bottom: 15px;
   background: var(--pp-white);
-}
-
-.home-page .pinpoint-header {
-  position: relative;
 }
 
 /* ── Layout ─────────────────────────────────────────────────────────────── */
@@ -362,7 +372,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 92px;
+  bottom: calc(var(--bottom-nav-margin) + var(--bottom-nav-height));
   z-index: 20;
   pointer-events: none;
 }
