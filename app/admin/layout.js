@@ -6,7 +6,7 @@ import AdminBottomNav from "@/components/admin/AdminBottomNav";
 import "@/styles/admin/admin.css";
 
 export default function AdminLayout({ children }) {
-  const { status } = useAuthGuard(["admin", "engineer"]);
+  const { status } = useAuthGuard(["admin"]);
 
   if (status !== "ready") {
     return (
