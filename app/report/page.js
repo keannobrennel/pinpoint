@@ -251,36 +251,64 @@ export default function ReportPage() {
     markerRef.current = marker;
 
     // Autocomplete restricted to Metro Manila
-    if (searchInputRef.current) {
-      const autocomplete = new window.google.maps.places.Autocomplete(
-        searchInputRef.current,
-        {
-          componentRestrictions: { country: "ph" },
-          bounds: new window.google.maps.LatLngBounds(
-            { lat: 14.3, lng: 120.7 },
-            { lat: 14.8, lng: 121.2 },
-          ),
-          strictBounds: true,
-          fields: ["geometry", "name", "formatted_address"],
-        },
-      );
+    // Some pages may load Google Maps via a different mechanism which can
+    // cause the Places library to be unavailable at the same time this
+    // effect runs. Create Autocomplete only when the constructor exists,
+    // polling briefly if needed rather than throwing.
+    let pollId = null;
+    const createAutocomplete = () => {
+      if (!searchInputRef.current) return false;
+      if (!window.google?.maps?.places?.Autocomplete) return false;
 
-      autocomplete.addListener("place_changed", () => {
-        const place = autocomplete.getPlace();
-        if (!place.geometry?.location) return;
+      try {
+        const autocomplete = new window.google.maps.places.Autocomplete(
+          searchInputRef.current,
+          {
+            componentRestrictions: { country: "ph" },
+            bounds: new window.google.maps.LatLngBounds(
+              { lat: 14.3, lng: 120.7 },
+              { lat: 14.8, lng: 121.2 },
+            ),
+            strictBounds: true,
+            fields: ["geometry", "name", "formatted_address"],
+          },
+        );
 
-        const lat = place.geometry.location.lat();
-        const lng = place.geometry.location.lng();
+        autocomplete.addListener("place_changed", () => {
+          const place = autocomplete.getPlace();
+          if (!place.geometry?.location) return;
 
-        map.panTo({ lat, lng });
-        map.setZoom(16);
-        marker.setPosition({ lat, lng });
-        marker.setVisible(true);
-        updatePinLocation(lat, lng);
-      });
+          const lat = place.geometry.location.lat();
+          const lng = place.geometry.location.lng();
 
-      autocompleteRef.current = autocomplete;
+          map.panTo({ lat, lng });
+          map.setZoom(16);
+          marker.setPosition({ lat, lng });
+          marker.setVisible(true);
+          updatePinLocation(lat, lng);
+        });
+
+        autocompleteRef.current = autocomplete;
+        return true;
+      } catch (err) {
+        console.warn("Autocomplete creation failed", err);
+        return false;
+      }
+    };
+
+    if (!createAutocomplete()) {
+      pollId = setInterval(() => {
+        if (createAutocomplete()) {
+          clearInterval(pollId);
+          pollId = null;
+        }
+      }, 250);
     }
+
+    // clear any polling when the component unmounts
+    return () => {
+      if (pollId) clearInterval(pollId);
+    };
   }, [status, mapReady, updatePinLocation]);
 
   // Pick up photo handed off by BottomNav camera FAB
@@ -367,9 +395,31 @@ export default function ReportPage() {
         }),
       });
 
-      const data = await res.json();
+      // Safely parse JSON: some error responses or server errors may return
+      // non-JSON or empty bodies, which would throw on res.json(). Check
+      // content-type and fallback to text parsing to avoid an uncaught
+      // SyntaxError in the client.
+      let data = null;
+      const ct = res.headers.get("content-type") || "";
+      if (ct.includes("application/json")) {
+        try {
+          data = await res.json();
+        } catch (e) {
+          console.warn("Failed to parse JSON response", e);
+          data = null;
+        }
+      } else {
+        const text = await res.text();
+        try {
+          data = text ? JSON.parse(text) : null;
+        } catch (e) {
+          // Non-JSON response body — swallow parse error and keep data=null
+          data = null;
+        }
+      }
+
       if (!res.ok) {
-        setError(data.error ?? "Submission failed.");
+        setError((data && data.error) || `Submission failed (status ${res.status}).`);
       } else {
         setResult(data);
       }
