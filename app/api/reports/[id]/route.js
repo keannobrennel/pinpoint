@@ -6,7 +6,16 @@ export async function GET(request, { params }) {
   const user = await verifyAuth(request);
   if (!user) return unauthorized();
 
-  const doc = await adminDb.collection("reports").doc(params.id).get();
+  const routeParams = await params;
+  const id = routeParams.id;
+  if (!id || typeof id !== "string") {
+    return new Response(JSON.stringify({ error: "Missing report id" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const doc = await adminDb.collection("reports").doc(id).get();
 
   if (!doc.exists) {
     return new Response(JSON.stringify({ error: "Report not found" }), {
@@ -25,6 +34,15 @@ export async function GET(request, { params }) {
 export async function PATCH(request, { params }) {
   const user = await verifyAuth(request);
   if (!user) return unauthorized();
+
+  const routeParams = await params;
+  const id = routeParams.id;
+  if (!id || typeof id !== "string") {
+    return new Response(JSON.stringify({ error: "Missing report id" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 
   if (user.role !== "engineer" && user.role !== "admin") {
     return new Response(JSON.stringify({ error: "Forbidden" }), {
@@ -61,7 +79,7 @@ export async function PATCH(request, { params }) {
     assessedAt: new Date().toISOString(),
   };
 
-  await adminDb.collection("reports").doc(params.id).update({
+  await adminDb.collection("reports").doc(id).update({
     engineerAssessment,
     status,
   });
