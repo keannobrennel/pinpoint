@@ -1,6 +1,7 @@
 // app/(app)/incidents/[id]/page.js
 "use client";
 
+import { use } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthGuard } from "@/lib/use-auth-guard";
 import ScreenHeader from "@/components/layout/ScreenHeader";
@@ -9,21 +10,8 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import PhasePill from "@/components/ui/PhasePill";
 import StatusBadge from "@/components/ui/StatusBadge";
 import ReportCard from "@/components/ui/ReportCard";
+import { getMockIncident } from "@/lib/mock-incidents";
 
-// Mock incident — replace with Firestore fetch by params.id when ready.
-const MOCK_INCIDENT = {
-  id: "1",
-  name: "Cracked Walls in San Jose",
-  location: "San Jose del Monte, Bulacan",
-  phase: "post-disaster",
-  status: "for_review",
-  verifiedOn: "June 29, 2026 | 10 AM",
-  verifiedBy: "Responder 01",
-  incidentNumber: "01",
-  reportsIncluded: 18,
-  description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-  hasAssessment: false,
-};
 
 const MOCK_REPORTS = [
   {
@@ -46,13 +34,18 @@ const MOCK_REPORTS = [
   },
 ];
 
+// remove the old local MOCK_INCIDENT const entirely
+
+
 export default function IncidentDetailPage({ params }) {
+  const routeParams = use(params);
+  const incidentId = routeParams.id;
   const { status } = useAuthGuard(["engineer"]);
   const router = useRouter();
 
   if (status !== "ready") return null;
 
-  const incident = MOCK_INCIDENT;
+  const incident = getMockIncident(incidentId);
 
   const metaRows = [
     { label: "Incident Name",      value: incident.name },
@@ -67,21 +60,17 @@ export default function IncidentDetailPage({ params }) {
 
   return (
     <div className="detail-screen">
-      <ScreenHeader title="Incident Details" />
+      <ScreenHeader title="Incident Details" onBack={() => router.push("/incidents")} />
 
-      {/* Metadata card */}
       <div className="detail-screen__card">
         <MetadataTable rows={metaRows} />
-
         <div className="detail-screen__divider" />
-
         <SectionHeader icon="fa-solid fa-wand-magic-sparkles">
           Description Summary
         </SectionHeader>
         <p className="detail-screen__body-text">{incident.description}</p>
       </div>
 
-      {/* Included reports list */}
       <SectionHeader>
         Reports Included ({incident.reportsIncluded})
       </SectionHeader>
@@ -97,25 +86,24 @@ export default function IncidentDetailPage({ params }) {
         ))}
       </div>
 
-      {/* Action button */}
       <div className="detail-screen__footer">
-        {incident.hasAssessment ? (
+        {incident.status === "assessed" ? (
           <button
             type="button"
             className="detail-screen__action-btn"
-            onClick={() => router.push(`/incidents/${params.id}/assessment`)}
+            onClick={() => router.push(`/incidents/${incidentId}/assessment/view`)}
           >
             View Assessment Result
           </button>
-        ) : (
+        ) : incident.status === "for_review" ? (
           <button
             type="button"
             className="detail-screen__action-btn"
-            onClick={() => router.push(`/incidents/${params.id}/assessment`)}
+            onClick={() => router.push(`/incidents/${incidentId}/assessment`)}
           >
             Start Assessment
           </button>
-        )}
+        ) : null}
       </div>
     </div>
   );

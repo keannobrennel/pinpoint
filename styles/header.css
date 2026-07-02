@@ -11,6 +11,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(26, 43, 94, 0.2);
 }
 
 .header-logo {
@@ -52,7 +53,7 @@
   padding: 0;
   cursor: pointer;
   overflow: hidden;
-  background: var(--pp-orange);
+  background: var(--pp-muted);
   flex-shrink: 0;
 }
 
@@ -71,5 +72,5 @@
   font-size: 17px;
   font-weight: 600;
   color: var(--pp-navy);
-  background: var(--pp-orange);
+  background: var(--pp-muted);
 }

@@ -62,9 +62,12 @@
 
 .greeting-mascot {
   position: absolute;
-  right: 0px;
-  bottom: 45px;
+  right: 24px;
+  bottom: 25px;
+  width: 180px;
+  aspect-ratio: 1 / 1;
   z-index: 1;
+  pointer-events: none;
 }
 
 .report-hazard-link {
@@ -97,7 +100,7 @@
 /* ── Nearby Alerts card ─────────────────────────────────────────────────── */
 
 .nearby-alerts-page {
-  margin: 0px 25px 15px 25px;
+  margin: 0px 25px 20px 25px;
   padding: 14px 16px 16px;
 }
 
@@ -177,9 +180,10 @@
 .nearby-alerts-page__content {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 30px;
   flex: 1;
   min-width: 0;
+  margin-left:4px;
 }
 
 .nearby-alerts-page__icon-wrap {
@@ -245,16 +249,34 @@
   margin: 2px 0 10px;
 }
 
+.nearby-alerts-page__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 3px;
+  width:90%;
+}
+
+.nearby-alerts-page__go-to,
 .nearby-alerts-page__view-more {
+  flex: 1;
   font-size: 12px;
   font-weight: 600;
-  color: var(--pp-white);
-  background: var(--pp-main);
   border: none;
   border-radius: 7px;
-  padding: 6px 14px;
-  margin-top: 3px;
+  padding: 6px 0;
   cursor: pointer;
+  text-align: center;
+  color: var(--pp-white);
+}
+
+/* Same purple already used for the "Engineer" role badge in profile.css
+   (#8f4fd6) — kept consistent rather than introducing a new brand color. */
+.nearby-alerts-page__go-to {
+  background: #8f4fd6;
+}
+
+.nearby-alerts-page__view-more {
+  background: var(--pp-main);
 }
 
 .nearby-alerts-page__dots {
@@ -288,8 +310,8 @@
   z-index: 30;
   margin: 0;
   padding: 40px 25px 15px 25px;
-  margin-bottom: 5px;
-  background: var(--pp-bg);
+  margin-bottom: 15px;
+  background: var(--pp-white);
 }
 
 .home-page .pinpoint-header {
@@ -311,6 +333,11 @@
   z-index: 0;
 }
 
+/*
+  Top overlay — no longer animated itself. Header lives here permanently
+  (see .pinpoint-header's z-index:30 further up this file) so it never
+  moves. Only .home-page__greeting-wrap (below) slides.
+*/
 .home-page__top-overlay {
   position: absolute;
   top: 0;
@@ -322,6 +349,17 @@
 
 .home-page__top-overlay > * {
   pointer-events: auto;
+}
+
+/*
+  Wraps just the Greeting card. z-index is deliberately LOWER than
+  .pinpoint-header's z-index:30, so when this slides up (translateY(-150%))
+  it passes behind the header's opaque background instead of the two
+  sliding away as one unit.
+*/
+.home-page__greeting-wrap {
+  position: relative;
+  z-index: 10;
 }
 
 .home-page__bottom-overlay {

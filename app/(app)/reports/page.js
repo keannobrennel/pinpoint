@@ -1,51 +1,40 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthGuard } from "@/lib/use-auth-guard";
+import { useReports } from "@/hooks/useReports";
 import ListScreenShell from "@/components/ui/ListScreenShell";
 import ReportCard from "@/components/ui/ReportCard";
 
 const TABS = [
-  { key: "all",  label: "All" },
-  { key: "pre",  label: "Pre-disaster" },
+  { key: "all", label: "All" },
+  { key: "pre", label: "Pre-disaster" },
   { key: "post", label: "Post-disaster" },
 ];
 
-// Placeholder reports — replace with Firestore data when ready.
-const MOCK_REPORTS = [
-  {
-    id: "1",
-    imageUrl: null,
-    aiAssessment: {
-      damageClassification: "structural_crack",
-      affectedStructureType: "San Jose",
-      phase: "post-disaster",
-    },
-    location: { barangay: "San Jose del Monte", city: "Bulacan" },
-    status: "unsafe",
-    reportedAt: "2026-06-29T10:00:00.000Z",
-    verifiedByName: "EMILY ELIMY",
-  },
-  {
-    id: "2",
-    imageUrl: null,
-    aiAssessment: {
-      damageClassification: "structural_crack",
-      affectedStructureType: "San Jose",
-      phase: "pre-disaster",
-    },
-    location: { barangay: "San Jose del Monte", city: "Bulacan" },
-    status: "unsafe",
-    reportedAt: "2026-06-29T10:00:00.000Z",
-    verifiedByName: "EMILY ELIMY",
-  },
-];
+// Maps tab keys to the aiAssessment.mode value written by the report
+// submission flow (app/(app)/report/page.js).
+const TAB_TO_MODE = {
+  pre: "pre_disaster",
+  post: "post_disaster",
+};
 
 export default function ReportsPage() {
-  const { status } = useAuthGuard(["responder", "engineer"]);
+  const { profile, status } = useAuthGuard(["responder", "engineer"]);
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState("all");
+
+  const { reports, loading } = useReports(profile?.role);
 
   if (status !== "ready") return null;
+
+  const filteredReports =
+    activeTab === "all"
+      ? reports
+      : reports.filter(
+          (report) => report.aiAssessment?.mode === TAB_TO_MODE[activeTab],
+        );
 
   return (
     <ListScreenShell
@@ -53,15 +42,23 @@ export default function ReportsPage() {
       subtitle="Review reports submitted by the residents."
       tabs={TABS}
       defaultTab="all"
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
     >
-      {MOCK_REPORTS.map((report) => (
-        <ReportCard
-          key={report.id}
-          report={report}
-          showReporter={true}
-          onClick={() => router.push(`/reports/${report.id}`)}
-        />
-      ))}
+      {loading ? (
+        <p className="reports-list-status">Loading reports...</p>
+      ) : filteredReports.length === 0 ? (
+        <p className="reports-list-status">No reports to show.</p>
+      ) : (
+        filteredReports.map((report) => (
+          <ReportCard
+            key={report.id}
+            report={report}
+            showReporter={true}
+            onClick={() => router.push(`/reports/${report.id}`)}
+          />
+        ))
+      )}
     </ListScreenShell>
   );
 }

@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useZones } from "@/hooks/useZones";
-import { useGeolocation } from "@/hooks/useGeolocation";
 import Header from "@/components/layout/Header";
 import Greeting from "@/components/home/Greeting";
 import NearbyAlertsPage from "@/components/home/NearbyAlertsPage";
@@ -17,13 +16,23 @@ import "@/styles/home.css";
 // drift out of sync with the CSS transition it's timed against.
 const OVERLAY_TRANSITION_MS = 320;
 
+// The home map ALWAYS opens showing Metro Manila as a whole, regardless of
+// the user's actual GPS position or which nearby alert happens to be first
+// in the list. Zooming to "where the user/an alert is" is intentionally
+// reserved for explicit user actions — stepping the carousel, tapping
+// "Go to" on a card, or the LocateButton + carousel flights on the full
+// /map page. Deliberately NOT sourced from useGeolocation() here: that
+// hook also triggers a GPS permission prompt as a side effect, which we
+// don't want firing just for a value we're not using on this page.
+const METRO_MANILA_CENTER = { lat: 14.5995, lng: 120.9842 };
+const METRO_MANILA_ZOOM = 11;
+
 export default function HomePage() {
   const router = useRouter();
   const { user, role } = useAuth();
   const isEngineer = role === "engineer";
 
   const { zones: realZones } = useZones();
-  const { location, zoom } = useGeolocation();
   const [isMapInteracting, setIsMapInteracting] = useState(false);
 
   // ── Entrance animation ──────────────────────────────────────────────────
@@ -52,9 +61,10 @@ export default function HomePage() {
   // TEMP TEST DATA — remove before merging
   //
   // Wrapped in useMemo so the array keeps stable object identities across
-  // renders. MapController (inside MapView.js) pans/zooms based on object
-  // reference changes — recreating this array on every render would cause
-  // unwanted re-pans whenever unrelated state (e.g. dialogZone) updates.
+  // renders. This matters less now for the fly-to-flight logic (see
+  // requestFocus below, which always wraps in a fresh object anyway), but
+  // it's still worth keeping stable so NearbyAlertsPage/ZoneDetailDialog
+  // don't re-render on unrelated state changes.
   //
   // placeName / postedBy / distance / timeAgo are the fields NearbyAlertsPage
   // needs for its card. They live directly on the zone object (instead of a
@@ -204,8 +214,28 @@ export default function HomePage() {
   const [dialogZone, setDialogZone] = useState(null);
 
   // activeAlertIndex: which nearby alert the carousel is currently on.
-  // Driving this via "‹ ›" also re-centers the map, through focusZone below.
   const [activeAlertIndex, setActiveAlertIndex] = useState(0);
+
+  // focusZone: the zone the map should fly to. Starts null — the map just
+  // sits on the Metro Manila overview on mount, untouched, until the user
+  // does something that explicitly asks for a flight: stepping the
+  // carousel ("‹"/"›"/dots) or tapping the new "Go to" button.
+  //
+  // Each request wraps the zone in a FRESH object (spread + a nonce)
+  // instead of reusing the array item straight from nearbyAlerts.
+  // MapController's flight effect (in MapView.js) keys off object
+  // identity — if "Go to" reused the same reference already sitting in
+  // focusZone (e.g. tapping it twice on the same card, or after the user
+  // panned the map away by hand), the effect simply wouldn't re-run since
+  // nothing "changed" as far as React's dependency check is concerned. The
+  // nonce guarantees every request is a genuinely new reference, so the
+  // flight always fires, every time.
+  const [focusZone, setFocusZone] = useState(null);
+
+  const requestFocus = (zone) => {
+    if (!zone) return;
+    setFocusZone({ ...zone, __focusNonce: Date.now() });
+  };
 
   const handleZoneSelect = (zone) => setDialogZone(zone);
   const handleCloseDialog = () => setDialogZone(null);
@@ -216,20 +246,23 @@ export default function HomePage() {
     const clamped =
       ((newIndex % nearbyAlerts.length) + nearbyAlerts.length) % nearbyAlerts.length;
     setActiveAlertIndex(clamped);
+    requestFocus(nearbyAlerts[clamped]);
   };
 
-  // The zone the map should pan/zoom to. Recomputed whenever the carousel
-  // index changes — independent of whether the dialog is open or closed.
-  const focusZone = nearbyAlerts[activeAlertIndex] ?? null;
+  // "Go to" button on the NearbyAlertsPage card — re-centers/flies the map
+  // to whichever zone is currently showing, WITHOUT changing the carousel
+  // index or opening the dialog. Useful when the user has panned the map
+  // away manually and wants to snap back to the alert they're looking at.
+  const handleGoTo = (zone) => requestFocus(zone);
 
-  // Overlays (Header+Greeting, HomeBottomCard) should hide whenever:
+  // Overlays that should hide/tuck away whenever:
   //   - the map is being interacted with (panning/zooming), OR
   //   - a zone dialog is open (tapped a heatmap blob or an engineer pin), OR
   //   - the user just tapped "Go to Map" and we're mid-exit-transition, OR
   //   - the page hasn't finished its mount-entrance transition yet.
-  // NOTE: dialogZone was dropped from this condition in a previous edit —
-  // restored here, since without it the dialog pops open on top of overlays
-  // that don't get out of the way.
+  //
+  // This only drives the Greeting card + the bottom overlay — Header is
+  // intentionally excluded, see the JSX below.
   const shouldHideOverlays =
     isMapInteracting || !!dialogZone || isLeavingToMap || !hasEntered;
 
@@ -239,8 +272,8 @@ export default function HomePage() {
         <div className="home-page__map-fill">
           <MapView
             zones={zones ?? []}
-            userLocation={location}
-            defaultZoom={zoom}
+            userLocation={METRO_MANILA_CENTER}
+            defaultZoom={METRO_MANILA_ZOOM}
             isEngineer={isEngineer}
             selectedZone={dialogZone}
             onZoneSelect={handleZoneSelect}
@@ -251,28 +284,32 @@ export default function HomePage() {
         </div>
 
         {/*
-          Top overlay — Header + Greeting slide/hide TOGETHER as one unit.
-          Same transform/transition driving the entrance animation (mount),
-          the map-drag hide, the dialog-open hide, and the "Go to Map" exit —
-          all just different reasons shouldHideOverlays can be true.
+          Top overlay — Header stays fixed here, un-animated, for the entire
+          lifetime of the page. Only the inner wrap around <Greeting>
+          slides. Header keeps its z-index:30 (set in home.css, higher than
+          the greeting wrap's z-index:10), so as the greeting card slides
+          upward it passes BEHIND the opaque header instead of the two
+          moving together.
         */}
-        <div
-          className="home-page__top-overlay"
-          style={{
-            transform: shouldHideOverlays ? 'translateY(-150%)' : 'translateY(0)',
-            transition: `transform ${OVERLAY_TRANSITION_MS}ms ease`,
-          }}
-        >
+        <div className="home-page__top-overlay">
           <Header userName={user?.name} />
-          <Greeting isEngineer={isEngineer} userName={user?.name} />
+
+          <div
+            className="home-page__greeting-wrap"
+            style={{
+              transform: shouldHideOverlays ? 'translateY(-150%)' : 'translateY(0)',
+              transition: `transform ${OVERLAY_TRANSITION_MS}ms ease`,
+            }}
+          >
+            <Greeting userName={user?.name} />
+          </div>
         </div>
 
         {/*
-          Bottom overlay — UNCHANGED from its original CSS-driven position
-          (home.css presumably sets position:absolute; bottom:0 on this
-          class to float it over the map). Do not add inline `position`
-          here — see the earlier bug this caused (broke the overlay's
-          float-over-map behavior entirely).
+          Bottom overlay — UNCHANGED CSS-driven position (home.css sets
+          position:absolute; bottom:0 on this class to float it over the
+          map). Do not add inline `position` here — see the earlier bug
+          this caused.
         */}
         <div
           className="home-page__bottom-overlay"
@@ -283,16 +320,13 @@ export default function HomePage() {
         >
           {/*
             "Go to Map" button row — top-right, fully OUTSIDE the Nearby
-            Alerts card (not overlapping its corner like a FAB anymore),
-            with a visible gap above the card. Plain flex row in normal
-            flow, so no extra positioned wrapper is needed here — simpler
-            and safer than the earlier absolute-positioned version.
+            Alerts card, with a visible gap above the card.
           */}
           <div
             style={{
               display: 'flex',
               justifyContent: 'flex-end',
-              margin: '0 16px 12px', // horizontal matches card margin; bottom is the gap above the card
+              margin: '0 16px 12px',
             }}
           >
             <button
@@ -326,9 +360,10 @@ export default function HomePage() {
             alerts={nearbyAlerts}
             stats={stats}
             isEngineer={isEngineer}
-            activeAlertIndex={activeAlertIndex}
-            onAlertIndexChange={handleAlertIndexChange}
+            activeIndex={activeAlertIndex}
+            onIndexChange={handleAlertIndexChange}
             onViewMore={handleViewMore}
+            onGoTo={handleGoTo}
           />
         </div>
       </div>

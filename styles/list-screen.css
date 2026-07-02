@@ -1,5 +1,5 @@
 /* styles/list-screen.css
-   ListScreenShell and FilterBar — used by Community, Reports, Incidents.
+   ListScreenShell and FilterBar — used by Community, Reports, Incidents, Activity.
 */
 
 .list-screen {
@@ -10,9 +10,17 @@
   height: 100%;
 }
 
+/* Used when ListScreenShell is rendered under a ScreenHeader (e.g. Activity).
+   ScreenHeader is position: fixed (see detail.css), so content below it
+   needs the same 96px clearance detail-screen pages already use — not
+   less padding, since the header isn't in normal document flow. */
+.list-screen--compact {
+  padding-top: 96px;
+}
+
 .list-screen__header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
@@ -24,21 +32,22 @@
 }
 
 .list-screen__title {
-  font-size: 34px;
+  font-size: 36px;
   font-weight: 800;
   color: var(--pp-main);
   line-height: 1.1;
 }
 
 .list-screen__subtitle {
-  font-size: 12px;
+  font-size: 15px;
   color: var(--pp-muted);
   font-weight: 400;
+  width: 270px;
 }
 
 .list-screen__filter-btn {
-  width: 36px;
-  height: 36px;
+  width: 50px;
+  height: 50px;
   border-radius: 10px;
   border: 1.5px solid var(--pp-border);
   background: var(--pp-white);
@@ -48,11 +57,11 @@
   justify-content: center;
   flex-shrink: 0;
   cursor: pointer;
-  margin-top: 4px;
+  box-shadow: 0 4px 16px rgba(26, 43, 94, 0.08);
 }
 
 .list-screen__filter-btn i {
-  font-size: 16px;
+  font-size: 20px;
 }
 
 .list-screen__content {
@@ -77,7 +86,7 @@
   border: 1.5px solid var(--pp-border);
   background: var(--pp-white);
   color: var(--pp-muted);
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
   font-family: var(--pp-font);
   cursor: pointer;
