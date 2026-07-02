@@ -25,7 +25,16 @@
   position: relative;
   width: 96px;
   min-width: 96px;
-  height: 100%;
+  /* No explicit height here on purpose. `.report-card` uses the flex
+     default `align-items: stretch`, which sizes this wrap to match
+     `.report-card__body`'s natural (content-based) height — so the
+     image always matches the card, on any page.
+     Previously this was `height: 100%`, which is circular: `.report-card`
+     itself has no set height (it's sized by its children), and this
+     wrap's only child is a next/image with `fill` (position: absolute),
+     which contributes zero intrinsic height. That left the 100%
+     resolving against nothing, so the image rendered at 0px tall
+     wherever stretch didn't otherwise get triggered some other way. */
   border-radius: 12px;
   overflow: hidden;
   background: var(--pp-border);
