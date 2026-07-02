@@ -13,11 +13,14 @@
   text-transform: uppercase;
 }
 
-.status-badge--verified  { background: #22c55e; color: #fff; }
-.status-badge--pending   { background: #f59e0b; color: #fff; }
-.status-badge--unsafe    { background: #ef4444; color: #fff; }
-.status-badge--assessed  { background: #3b82f6; color: #fff; }
-.status-badge--default   { background: var(--pp-border); color: var(--pp-navy); }
+.status-badge--verified    { background: #22c55e; color: #fff; } /* resolved / responder_verified */
+.status-badge--pending     { background: #f59e0b; color: #fff; } /* pending */
+.status-badge--unsafe      { background: #ef4444; color: #fff; } /* unsafe / verified_false */
+.status-badge--assessed    { background: #3b82f6; color: #fff; } /* inspected */
+.status-badge--dispatched  { background: #8b5cf6; color: #fff; } /* inspector_dispatched */
+.status-badge--maintenance { background: #f97316; color: #fff; } /* under_maintenance */
+.status-badge--restricted  { background: #eab308; color: #1f1300; } /* restricted_use (ATC-20 placard) */
+.status-badge--default     { background: var(--pp-border); color: var(--pp-navy); }
 
 /* ── Phase Pill ── */
 .phase-pill {
