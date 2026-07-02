@@ -1,4 +1,7 @@
+"use client";
+
 // components/community/AnnouncementCard.jsx
+import { useState } from "react";
 import Image from "next/image";
 
 /**
@@ -22,6 +25,9 @@ export default function AnnouncementCard({
   postedAt,
   photoUrl,
 }) {
+  const [imgError, setImgError] = useState(false);
+  const showPhoto = photoUrl && !imgError;
+
   return (
     <div className="announcement-card">
         <div className="announcement-card__header">
@@ -40,7 +46,7 @@ export default function AnnouncementCard({
         Posted by {postedBy}
       </p>
 
-      {photoUrl && (
+      {showPhoto && (
         <div className="announcement-card__photo-wrap">
           <Image
             src={photoUrl}
@@ -48,6 +54,7 @@ export default function AnnouncementCard({
             fill
             className="announcement-card__photo"
             sizes="(max-width: 600px) 100vw, 600px"
+            onError={() => setImgError(true)}
           />
         </div>
       )}

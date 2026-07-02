@@ -54,10 +54,20 @@ export default function Header() {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-        <i
-          className="fa-regular fa-bell fa-2xl"
-          style={{ color: "rgb(42, 102, 151)" }}
-        ></i>
+
+        {/* User activity icon — opens the signed-in user's own report
+            history / status (app/(app)/activity/page.js). */}
+        <Link
+          href="/activity"
+          aria-label="View your activity"
+          style={{ display: "inline-flex", alignItems: "center" }}
+        >
+          <i
+            className="fa-solid fa-clipboard-list fa-2xl"
+            style={{ color: "#7a8aab" }}
+          ></i>
+        </Link>
+
         <Link href="/profile" className="header-avatar" aria-label="Open profile">
           {photoURL ? (
             <Image
