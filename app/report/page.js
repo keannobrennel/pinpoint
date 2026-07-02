@@ -154,17 +154,39 @@ export default function ReportPage() {
 
   // Load Google Maps
   useEffect(() => {
-    if (window.google?.maps) {
+    // Check for Map specifically, not just window.google.maps — with
+    // loading=async that namespace can exist as a partial stub before the
+    // actual classes (Map, Marker, ...) are attached.
+    if (window.google?.maps?.Map) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setMapReady(true);
       return;
     }
 
+    const existingScript = document.getElementById("google-maps-script");
+    if (existingScript) {
+      // Another mount already kicked off the load — just wait for the
+      // callback it registered to flip mapReady.
+      existingScript.addEventListener("google-maps-ready", () => setMapReady(true));
+      return;
+    }
+
+    // `script.onload` fires as soon as the (tiny) bootstrap loader
+    // downloads, NOT when google.maps.Map etc. actually exist — that's
+    // what was causing "google.maps.Map is not a constructor". The
+    // `callback` param is what genuinely waits for the library to load.
+    window.__initGoogleMaps = () => {
+      setMapReady(true);
+      document
+        .getElementById("google-maps-script")
+        ?.dispatchEvent(new Event("google-maps-ready"));
+    };
+
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&loading=async`;
+    script.id = "google-maps-script";
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&loading=async&callback=__initGoogleMaps`;
     script.async = true;
     script.defer = true;
-    script.onload = () => setMapReady(true);
     script.onerror = () => console.error("Failed to load Google Maps");
     document.head.appendChild(script);
   }, []);
