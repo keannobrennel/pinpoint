@@ -7,6 +7,15 @@ export async function PATCH(request, { params }) {
   const user = await verifyAuth(request);
   if (!user) return unauthorized();
 
+  const routeParams = await params;
+  const id = routeParams.id;
+  if (!id || typeof id !== "string") {
+    return new Response(JSON.stringify({ error: "Missing report id" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   if (
     user.role !== "responder" &&
     user.role !== "engineer" &&
@@ -33,7 +42,7 @@ export async function PATCH(request, { params }) {
     );
   }
 
-  const reportRef = adminDb.collection("reports").doc(params.id);
+  const reportRef = adminDb.collection("reports").doc(id);
   const doc = await reportRef.get();
 
   if (!doc.exists) {
