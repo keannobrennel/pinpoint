@@ -1,3 +1,5 @@
+//app/(app)/reports/page.js
+
 "use client";
 
 import { useState } from "react";
@@ -25,6 +27,9 @@ export default function ReportsPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("all");
 
+  // useReports already listens live to the Firestore "reports" collection
+  // for staff roles (see hooks/useReports.js) — this page is backend-connected
+  // as-is, status badges just needed StatusBadge to know about "auto_verified".
   const { reports, loading } = useReports(profile?.role);
 
   if (status !== "ready") return null;
@@ -42,8 +47,10 @@ export default function ReportsPage() {
       subtitle="Review reports submitted by the residents."
       tabs={TABS}
       defaultTab="all"
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
+      // BUGFIX: ListScreenShell's prop is `onFilterChange`, not `onTabChange`.
+      // The old prop name was silently ignored, so tab clicks updated the
+      // pill highlight but never re-filtered the list below it.
+      onFilterChange={setActiveTab}
     >
       {loading ? (
         <p className="reports-list-status">Loading reports...</p>

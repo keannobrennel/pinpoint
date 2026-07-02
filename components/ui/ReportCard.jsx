@@ -11,6 +11,10 @@ import Image from "next/image";
 import StatusBadge from "@/components/ui/StatusBadge";
 import PhasePill from "@/components/ui/PhasePill";
 
+// BUGFIX: aiAssessment never has a `.phase` field — only `.mode`
+// ("pre_disaster" | "post_disaster", see lib/gemini.js). The old code
+// read aiAssessment.phase, which is always undefined, so every card
+// silently fell back to "pre-disaster" regardless of actual mode.
 export default function ReportCard({ report, onClick, showReporter = true }) {
   const {
     imageUrl,
@@ -73,7 +77,13 @@ export default function ReportCard({ report, onClick, showReporter = true }) {
           </p>
         )}
 
-        <PhasePill phase={aiAssessment?.phase ?? "pre-disaster"} />
+        <PhasePill
+          phase={
+            aiAssessment?.mode === "post_disaster"
+              ? "post-disaster"
+              : "pre-disaster"
+          }
+        />
 
         <div className="report-card__footer--stacked">
           {submittedDate && (

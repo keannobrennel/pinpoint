@@ -1,8 +1,17 @@
+// app/api/reports/[id]/verify/route.js
+
 import { adminDb } from "@/lib/firebase-admin";
 import { verifyAuth, unauthorized } from "@/lib/auth-middleware";
 
 // PATCH /api/reports/[id]/verify — responder or engineer marks a report
-// as verified true or false after visiting/reviewing the site.
+// as verified, false, or reverts it back to unverified/pending.
+//
+// verificationStatus accepts:
+//   "verified_true"  — mark verified (status -> "responder_verified")
+//   "verified_false" — mark false (status -> "verified_false", archived, PERMANENT)
+//   "unverified"      — revert back to pending (status -> "pending") — this
+//                        is the "Unverify" action; toggles freely with
+//                        "verified_true" but can never undo "verified_false".
 export async function PATCH(request, { params }) {
   const user = await verifyAuth(request);
   if (!user) return unauthorized();
@@ -30,13 +39,12 @@ export async function PATCH(request, { params }) {
   const body = await request.json();
   const { verificationStatus, responderNote } = body;
 
-  if (
-    verificationStatus !== "verified_true" &&
-    verificationStatus !== "verified_false"
-  ) {
+  const VALID_STATUSES = ["verified_true", "verified_false", "unverified"];
+  if (!VALID_STATUSES.includes(verificationStatus)) {
     return new Response(
       JSON.stringify({
-        error: "verificationStatus must be 'verified_true' or 'verified_false'",
+        error:
+          "verificationStatus must be 'verified_true', 'verified_false', or 'unverified'",
       }),
       { status: 400, headers: { "Content-Type": "application/json" } },
     );
@@ -54,6 +62,8 @@ export async function PATCH(request, { params }) {
 
   const existing = doc.data();
 
+  // Auto-verified reports (submitted by staff) are never touched by this
+  // endpoint — unchanged from original behavior.
   if (existing.isAutoVerified) {
     return new Response(
       JSON.stringify({
@@ -64,13 +74,15 @@ export async function PATCH(request, { params }) {
     );
   }
 
-  if (
-    existing.verificationStatus === "verified_true" ||
-    existing.verificationStatus === "verified_false"
-  ) {
+  // A report marked "verified_false" is a permanent, final determination —
+  // it can never be reopened through this endpoint, regardless of the
+  // requested new value. Everything else (pending <-> verified_true) is
+  // freely toggleable, since that's the actual Verify/Unverify UI flow.
+  if (existing.verificationStatus === "verified_false") {
     return new Response(
       JSON.stringify({
-        error: "This report has already been verified and cannot be changed.",
+        error:
+          "This report was marked false and cannot be changed.",
       }),
       { status: 409, headers: { "Content-Type": "application/json" } },
     );
@@ -78,28 +90,43 @@ export async function PATCH(request, { params }) {
 
   const now = new Date().toISOString();
 
-  // Look up the verifier's profile so report cards can display
-  // "Verified by <name>, <role>" without an extra read per card.
-  const verifierDoc = await adminDb.collection("users").doc(user.uid).get();
-  const verifierName = verifierDoc.exists
-    ? verifierDoc.data().displayName
-    : "Unknown";
+  let update;
 
-  const update = {
-    verificationStatus,
-    verifiedBy: user.uid,
-    verifiedByName: verifierName,
-    verifiedByRole: user.role,
-    verifiedAt: now,
-    responderNote: responderNote ?? null,
-  };
-
-  if (verificationStatus === "verified_false") {
-    update.status = "verified_false";
-    update.archivedAt = now;
-    update.archivedReason = "verified_false";
+  if (verificationStatus === "unverified") {
+    // "Unverify" — revert back to the original pending state.
+    update = {
+      verificationStatus: "unverified",
+      status: "pending",
+      verifiedBy: null,
+      verifiedByName: null,
+      verifiedByRole: null,
+      verifiedAt: null,
+      responderNote: null,
+    };
   } else {
-    update.status = "responder_verified";
+    // Look up the verifier's profile so report cards can display
+    // "Verified by <name>, <role>" without an extra read per card.
+    const verifierDoc = await adminDb.collection("users").doc(user.uid).get();
+    const verifierName = verifierDoc.exists
+      ? verifierDoc.data().displayName
+      : "Unknown";
+
+    update = {
+      verificationStatus,
+      verifiedBy: user.uid,
+      verifiedByName: verifierName,
+      verifiedByRole: user.role,
+      verifiedAt: now,
+      responderNote: responderNote ?? null,
+    };
+
+    if (verificationStatus === "verified_false") {
+      update.status = "verified_false";
+      update.archivedAt = now;
+      update.archivedReason = "verified_false";
+    } else {
+      update.status = "responder_verified";
+    }
   }
 
   await reportRef.update(update);
