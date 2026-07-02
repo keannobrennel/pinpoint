@@ -40,6 +40,22 @@
   margin-top: -3px;
 }
 
+.header-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 41px;
+  height: 41px;
+  border-radius: 50%;
+  background: var(--pp-border);
+  color: var(--pp-navy);
+  flex-shrink: 0;
+}
+
+.header-icon-btn i {
+  font-size: 18px;
+}
+
 .header-avatar {
   width: 41px;
   height: 41px;

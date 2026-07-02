@@ -115,9 +115,9 @@
 
 .nearby-alerts-page__title {
   margin: 0;
-  font-weight: 800;
+  font-weight: 700;
   font-size: 18px;
-  color: #111827;
+  color: var(--pp-navy);
   display: flex;
   align-items: center;
   gap: 10px;

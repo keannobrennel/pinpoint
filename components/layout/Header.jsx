@@ -47,12 +47,9 @@ export default function Header() {
         <Link
           href="/activity"
           aria-label="View your activity"
-          style={{ display: "inline-flex", alignItems: "center" }}
+          className="header-icon-btn"
         >
-          <i
-            className="fa-solid fa-clipboard-list fa-2xl"
-            style={{ color: "#7a8aab" }}
-          ></i>
+          <i className="fa-solid fa-clipboard-list"></i>
         </Link>
 
         <Link href="/profile" className="header-avatar" aria-label="Open profile">
