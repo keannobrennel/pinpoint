@@ -41,14 +41,14 @@
 }
 
 .header-avatar {
-  width: 47px;
-  height: 47px;
+  width: 41px;
+  height: 41px;
   border-radius: 50%;
   border: none;
   padding: 0;
   cursor: pointer;
   overflow: hidden;
-  background: var(--pp-muted);
+  background: var(--pp-navy);
   flex-shrink: 0;
 }
 
@@ -66,6 +66,6 @@
   height: 100%;
   font-size: 17px;
   font-weight: 600;
-  color: var(--pp-navy);
-  background: var(--pp-muted);
+  color: var(--pp-white);
+  background: var(--pp-navy);
 }

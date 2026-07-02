@@ -4,35 +4,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 
-// Generic person-silhouette icon shown when the user has no profile photo.
-function DefaultAvatarIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      width="60%"
-      height="60%"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="8" r="4" fill="#fff" fillOpacity="0.9" />
-      <path
-        d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"
-        fill="#fff"
-        fillOpacity="0.9"
-      />
-    </svg>
-  );
-}
-
 export default function Header() {
   const { user } = useAuth();
 
   // Field names guessed to match how `user` is already used elsewhere
   // (page.js reads `user?.name`). If your useAuth hook exposes the photo
   // under a different key (e.g. `photoUrl`), add it to this list.
-  const displayName = user?.name ?? user?.displayName ?? "";
+  //
+  // Same fallback as app/(detail)/profile/page.js: default to "User" so we
+  // never end up computing an initial from an empty string.
+  const displayName = user?.name ?? user?.displayName ?? "User";
   const photoURL = user?.photoURL ?? user?.photoUrl ?? user?.avatarUrl ?? null;
+
+  // Fallback shown when there's no profile photo: first letter of the
+  // user's display name (uppercased). Matches getInitial() in
+  // app/(detail)/profile/page.js.
+  const avatarInitial = displayName.trim().charAt(0).toUpperCase() || "U";
 
   return (
     <header className="pinpoint-header">
@@ -53,7 +40,7 @@ export default function Header() {
         </div>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
 
         {/* User activity icon — opens the signed-in user's own report
             history / status (app/(app)/activity/page.js). */}
@@ -78,8 +65,8 @@ export default function Header() {
               className="avatar-img"
             />
           ) : (
-            <span className="avatar-fallback">
-              <DefaultAvatarIcon />
+            <span className="avatar-fallback" aria-hidden="true">
+              {avatarInitial}
             </span>
           )}
         </Link>
