@@ -1,5 +1,5 @@
 /* styles/list-screen.css
-   ListScreenShell and FilterBar — used by Community, Reports, Incidents.
+   ListScreenShell and FilterBar — used by Community, Reports, Incidents, Activity.
 */
 
 .list-screen {
@@ -8,6 +8,14 @@
   padding-top: 40px;
   gap: 12px;
   height: 100%;
+}
+
+/* Used when ListScreenShell is rendered under a ScreenHeader (e.g. Activity).
+   ScreenHeader is position: fixed (see detail.css), so content below it
+   needs the same 96px clearance detail-screen pages already use — not
+   less padding, since the header isn't in normal document flow. */
+.list-screen--compact {
+  padding-top: 96px;
 }
 
 .list-screen__header {
