@@ -1,4 +1,4 @@
-// app/(app)/incidents/[id]/page.js
+// app/(detail)/incidents/[id]/page.js
 "use client";
 
 import { use } from "react";

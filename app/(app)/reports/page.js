@@ -1,3 +1,5 @@
+//app/(app)/reports/page.js
+
 "use client";
 
 import { useState } from "react";
@@ -28,6 +30,9 @@ export default function ReportsPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("all");
 
+  // useReports already listens live to the Firestore "reports" collection
+  // for staff roles (see hooks/useReports.js) — this page is backend-connected
+  // as-is, status badges just needed StatusBadge to know about "auto_verified".
   const { reports, loading } = useReports(profile?.role);
 
   if (status !== "ready") return null;
