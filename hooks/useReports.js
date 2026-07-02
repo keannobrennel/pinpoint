@@ -15,7 +15,7 @@ export function useReports(role) {
   const [zones, setZones] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const isStaff = role === "engineer" || role === "admin";
+  const isStaff = role === "engineer" || role === "admin" || role === "responder";
 
   // reports listener
   useEffect(() => {

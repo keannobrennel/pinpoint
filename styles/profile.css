@@ -170,9 +170,9 @@
 /* Sign-out uses the shared action-btn but needs an outlined destructive
    treatment (white background, red border/text) per design. */
 .detail-screen__action-btn--danger {
-  background: var(--pp-white);
+  background: var(--pp-bg);
   color: #e0433f;
-  border: 1.5px solid #e0433f;
+  border: 2px solid #e0433f;
 }
 
 /* ---------- Edit mode: avatar upload overlay ---------- */
