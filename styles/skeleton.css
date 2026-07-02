@@ -1,0 +1,376 @@
+/* styles/skeleton.css
+   Shared skeleton-loading building blocks — shimmering placeholder blocks
+   used while data is still loading (e.g. useAuth() resolving in
+   app/(app)/layout.js). Compose these into page-specific skeletons like
+   .home-skeleton below rather than hand-rolling one-off gray boxes.
+*/
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--pp-skeleton-base, #e6e8ee) 25%,
+    var(--pp-skeleton-highlight, #f2f3f7) 37%,
+    var(--pp-skeleton-base, #e6e8ee) 63%
+  );
+  background-size: 800px 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+.skeleton-circle {
+  border-radius: 50%;
+}
+
+.skeleton-line {
+  height: 12px;
+  border-radius: 6px;
+}
+
+/* ── Home page skeleton composition ──────────────────────────────────────
+   Mirrors app/(app)/home/page.js's structure (Header, Greeting card, map
+   area, NearbyAlertsPage card, BottomNav) so swapping this out for real
+   content doesn't cause a layout jump. Kept intentionally approximate —
+   skeletons don't need to be pixel-perfect, just the right shape. */
+
+.home-skeleton {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: var(--pp-bg, #f4f5f9);
+  overflow: hidden;
+}
+
+.home-skeleton__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 25px 15px 25px;
+  background: var(--pp-white, #fff);
+  flex-shrink: 0;
+}
+
+.home-skeleton__logo-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-skeleton__logo-pin {
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.home-skeleton__logo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.home-skeleton__icons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.home-skeleton__icon,
+.home-skeleton__avatar {
+  width: 41px;
+  height: 41px;
+  flex-shrink: 0;
+}
+
+.home-skeleton__body {
+  flex: 1;
+  min-height: 0;
+  padding: 15px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow: hidden;
+}
+
+.home-skeleton__greeting {
+  margin: 0 25px;
+  padding: 18px 20px 20px;
+  min-height: 150px;
+  background: var(--pp-white, #fff);
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 6px 20px rgba(1, 39, 124, 0.1);
+  flex-shrink: 0;
+}
+
+.home-skeleton__greeting-line--narrow {
+  width: 45%;
+}
+
+.home-skeleton__greeting-line--wide {
+  width: 70%;
+  height: 22px;
+}
+
+.home-skeleton__greeting-btn {
+  margin-top: auto;
+  height: 46px;
+  border-radius: 12px;
+}
+
+.home-skeleton__map {
+  flex: 1;
+  min-height: 0;
+  margin: 0 25px;
+  border-radius: 18px;
+}
+
+.home-skeleton__alerts {
+  margin: 0 25px;
+  padding: 14px 16px 16px;
+  background: var(--pp-white, #fff);
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 6px 20px rgba(1, 39, 124, 0.1);
+  flex-shrink: 0;
+}
+
+.home-skeleton__alerts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.home-skeleton__alerts-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-skeleton__alerts-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.home-skeleton__alerts-title-line {
+  width: 110px;
+  height: 16px;
+}
+
+.home-skeleton__alerts-see-all {
+  width: 50px;
+  height: 12px;
+}
+
+.home-skeleton__alerts-pill {
+  width: 130px;
+  height: 20px;
+  border-radius: 20px;
+}
+
+.home-skeleton__alerts-place {
+  width: 65%;
+  height: 18px;
+}
+
+.home-skeleton__alerts-meta {
+  width: 40%;
+}
+
+.home-skeleton__alerts-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 3px;
+}
+
+.home-skeleton__alerts-btn {
+  flex: 1;
+  height: 28px;
+  border-radius: 7px;
+}
+
+.home-skeleton__bottom-nav {
+  height: var(--bottom-nav-height, 64px);
+  margin: 0 16px calc(var(--bottom-nav-margin, 12px) + 4px);
+  border-radius: 18px;
+  flex-shrink: 0;
+}
+
+/* ── List-screen skeleton composition ──────────────────────────────────────
+   For the Incidents/Reports/Community-style routes — big title + subtitle,
+   a filter icon button, filter chips, and cards with an image thumbnail,
+   status pill, category badge, and metadata lines. See list-screen.css/
+   cards.css/badges.css for the real versions this mirrors. */
+
+.list-skeleton {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: var(--pp-bg, #f4f5f9);
+  overflow: hidden;
+}
+
+.list-skeleton__header {
+  flex-shrink: 0;
+  padding: 40px 25px 15px;
+}
+
+.list-skeleton__title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.list-skeleton__title {
+  width: 150px;
+  height: 32px;
+}
+
+.list-skeleton__filter-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.list-skeleton__subtitle-lines {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.list-skeleton__subtitle-line--wide {
+  width: 90%;
+}
+
+.list-skeleton__subtitle-line--narrow {
+  width: 55%;
+}
+
+.list-skeleton__chips {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.list-skeleton__chip {
+  height: 34px;
+  border-radius: 20px;
+}
+
+.list-skeleton__body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 4px 25px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.list-skeleton__card {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  background: var(--pp-white, #fff);
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(1, 39, 124, 0.08);
+  flex-shrink: 0;
+}
+
+.list-skeleton__card-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.list-skeleton__card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.list-skeleton__card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.list-skeleton__card-status {
+  width: 80px;
+  height: 22px;
+  border-radius: 20px;
+}
+
+.list-skeleton__card-arrow {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.list-skeleton__card-title {
+  width: 75%;
+  height: 15px;
+}
+
+.list-skeleton__card-location {
+  width: 45%;
+  height: 11px;
+}
+
+.list-skeleton__card-category {
+  width: 110px;
+  height: 18px;
+  border-radius: 20px;
+}
+
+.list-skeleton__card-meta {
+  width: 55%;
+  height: 11px;
+}
+
+.list-skeleton__card-meta--narrow {
+  width: 40%;
+  height: 10px;
+}
+
+.list-skeleton__nav-wrap {
+  position: relative;
+  flex-shrink: 0;
+  padding: 0 16px calc(var(--bottom-nav-margin, 12px) + 4px);
+}
+
+.list-skeleton__nav-bar {
+  height: 64px;
+  border-radius: 20px;
+}
+
+.list-skeleton__nav-fab {
+  position: absolute;
+  right: 26px;
+  bottom: calc(var(--bottom-nav-margin, 12px) + 8px);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+}

@@ -46,3 +46,4 @@ service-account.json
 
 # dev-only firestore seeder scripts, not part of the deployed app
 /seeder/
+/seed/
