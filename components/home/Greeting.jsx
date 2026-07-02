@@ -32,7 +32,7 @@ export default function Greeting({ userName }) {
         />
       </div>
 
-      <Link href="/report/new" className="report-hazard-link">
+      <Link href="/report" className="report-hazard-link">
         <button className="report-hazard-btn">
           <i className="fa-regular fa-camera fa-xl"></i>
           Report Hazard
