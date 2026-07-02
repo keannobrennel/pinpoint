@@ -1,4 +1,5 @@
 import ListScreenShell from "@/components/ui/ListScreenShell";
+import AnnouncementCard from "@/components/community/AnnouncementCard";
 
 const TABS = [
   { key: "all",      label: "All" },
@@ -16,6 +17,7 @@ const MOCK_ANNOUNCEMENTS = [
     postedBy: "San Jose Engineering Office",
     postedAt: "1min ago",
     resolved: false,
+    photoUrl: "/uploads/mabini-crack.jpg", // optional — omit or set null for no photo
   },
 ];
 
@@ -28,20 +30,7 @@ export default function CommunityPage() {
       defaultTab="all"
     >
       {MOCK_ANNOUNCEMENTS.map((item) => (
-        <div key={item.id} className="announcement-card">
-          <div className="announcement-card__type">{item.type}</div>
-          <div className="announcement-card__time">{item.postedAt}</div>
-          <p className="announcement-card__title">{item.title}</p>
-          <p className="announcement-card__location">
-            <i className="fa-solid fa-location-dot" aria-hidden="true" />
-            {item.location}
-          </p>
-          <p className="announcement-card__body">{item.body}</p>
-          <p className="announcement-card__posted-by">
-            <i className="fa-solid fa-circle-check" aria-hidden="true" />
-            Posted by {item.postedBy}
-          </p>
-        </div>
+        <AnnouncementCard key={item.id} {...item} />
       ))}
     </ListScreenShell>
   );

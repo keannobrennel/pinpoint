@@ -100,7 +100,7 @@
 /* ── Nearby Alerts card ─────────────────────────────────────────────────── */
 
 .nearby-alerts-page {
-  margin: 0px 25px 15px 25px;
+  margin: 0px 25px 20px 25px;
   padding: 14px 16px 16px;
 }
 
@@ -310,8 +310,8 @@
   z-index: 30;
   margin: 0;
   padding: 40px 25px 15px 25px;
-  margin-bottom: 10px;
-  background: var(--pp-bg);
+  margin-bottom: 15px;
+  background: var(--pp-white);
 }
 
 .home-page .pinpoint-header {

@@ -23,7 +23,7 @@ const PENDING_PHOTO_KEY = "pendingReportPhoto";
 const ALL_NAV_ITEMS = [
   { href: "/home",      label: "Home",      icon: "fa-solid fa-house",                  roles: ["public", "responder", "engineer"] },
   { href: "/community", label: "Community", icon: "fa-solid fa-bullhorn",               roles: ["public", "responder", "engineer"] },
-  { href: "/reports",   label: "Reports",   icon: "fa-solid fa-file-lines",             roles: ["responder", "engineer"] },
+  { href: "/reports",   label: "Reports",   icon: "fa-solid fa-file-lines",             roles: ["responder"] },
   { href: "/incidents", label: "Incidents", icon: "fa-solid fa-triangle-exclamation",   roles: ["engineer"] },
 ];
 
