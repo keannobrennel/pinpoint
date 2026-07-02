@@ -100,7 +100,7 @@
 /* ── Nearby Alerts card ─────────────────────────────────────────────────── */
 
 .nearby-alerts-page {
-  margin: 0px 25px 20px 25px;
+  margin: 0px 25px 15px 25px;
   padding: 14px 16px 16px;
 }
 
@@ -163,11 +163,8 @@
   flex-shrink: 0;
   width: 26px;
   height: 26px;
-  border-radius: 50%;
-  border: 1px solid #e5e7eb;
-  background: var(--pp-white);
-  color: #374151;
-  font-size: 14px;
+  color: var(--pp-muted);
+  font-size: 19px;
   line-height: 1;
   cursor: pointer;
 }
@@ -253,7 +250,6 @@
   display: flex;
   gap: 8px;
   margin-top: 3px;
-  width:90%;
 }
 
 .nearby-alerts-page__go-to,
