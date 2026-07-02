@@ -53,10 +53,19 @@ export default function ReportDetailPage({ params }) {
   const metaRows = [
     { label: "Report Name", value: formatReportTitle(report) },
     { label: "Location", value: formatReportLocation(report) || "—" },
-    // NOTE: aiAssessment.phase isn't defined in lib/schemas.js (only
-    // aiAssessment.mode is). Falls back to "pre-disaster" until that's
-    // resolved — see the mode-vs-phase note also flagged in ReportCard.jsx.
-    { label: "Phase", value: <PhasePill phase={report.aiAssessment?.phase ?? "pre-disaster"} /> },
+    // Phase lives in report.mode (e.g. "post_disaster"), duplicated at
+    // aiAssessment.mode — there is no "phase" field on the schema. Convert
+    // underscores to hyphens since PhasePill's PHASE_CONFIG keys are
+    // hyphenated ("post-disaster" / "pre-disaster"). Same fix applied in
+    // ReportCard.jsx.
+    {
+      label: "Phase",
+      value: (
+        <PhasePill
+          phase={(report.mode ?? report.aiAssessment?.mode ?? "pre_disaster").replace(/_/g, "-")}
+        />
+      ),
+    },
     { label: "Status", value: <StatusBadge status={report.status} /> },
     { label: "Reported on", value: formatReportDateTime(report.reportedAt) },
     // submittedByName is resolved client-side in useReport.js by looking

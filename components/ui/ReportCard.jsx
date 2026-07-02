@@ -20,6 +20,7 @@ export default function ReportCard({ report, onClick, showReporter = true }) {
     status,
     reportedAt,
     verifiedByName,
+    mode,
   } = report;
 
   const title = aiAssessment?.affectedStructureType
@@ -76,7 +77,7 @@ export default function ReportCard({ report, onClick, showReporter = true }) {
           </p>
         )}
 
-        <PhasePill phase={aiAssessment?.phase ?? "pre-disaster"} />
+        <PhasePill phase={(mode ?? aiAssessment?.mode ?? "pre_disaster").replace(/_/g, "-")} />
 
         <div className="report-card__footer--stacked">
           {submittedDate && (
