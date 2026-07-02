@@ -1,4 +1,4 @@
-// app/(app)/reports/[id]/page.js
+// app/(detail)/reports/[id]/page.js
 "use client";
 
 import { use, useEffect, useState } from "react";
