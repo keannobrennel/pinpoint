@@ -86,7 +86,7 @@ export default function IncidentCard({ incident, onClick }) {
         </div>
 
         {verdictPostedAt && (
-          <div className="report-card__footer">
+          <div className="report-card__footer--stacked">
             <span>
               Verified on:{" "}
               {new Date(verdictPostedAt).toLocaleDateString("en-PH", {

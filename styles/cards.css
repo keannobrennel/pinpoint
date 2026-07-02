@@ -25,7 +25,7 @@
   position: relative;
   width: 96px;
   min-width: 96px;
-  height: 96px;
+  height: 100%;
   border-radius: 12px;
   overflow: hidden;
   background: var(--pp-border);
@@ -50,6 +50,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 4px;
   min-width: 0;
 }
@@ -58,6 +59,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
 }
 
 .report-card__arrow {
@@ -67,20 +69,21 @@
 }
 
 .report-card__title {
-  font-size: 14px;
+  font-size: 19px;
   font-weight: 700;
   color: var(--pp-navy);
   line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
 }
 
 .report-card__location {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 11px;
+  font-size: 13px;
   color: var(--pp-muted);
 }
 
@@ -91,11 +94,23 @@
 
 .report-card__footer {
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--pp-muted);
+  width: 100%;
+}
+
+.report-card__footer--stacked {
+  display: flex;
   flex-direction: column;
   gap: 1px;
   margin-top: 2px;
   font-size: 11px;
   color: var(--pp-muted);
+  width: 100%;
 }
 
 .report-card__count {
@@ -103,7 +118,7 @@
   align-items: center;
   gap: 4px;
   font-weight: 700;
-  color: var(--pp-navy);
+  color: var(--pp-main);
   font-size: 12px;
 }
 
@@ -121,9 +136,14 @@
   flex-direction: column;
   gap: 4px;
 }
+.announcement-card__header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
 .announcement-card__type {
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
   color: #f97316;
   text-transform: uppercase;
@@ -136,7 +156,7 @@
 }
 
 .announcement-card__title {
-  font-size: 14px;
+  font-size: 19px;
   font-weight: 700;
   color: var(--pp-navy);
 }
@@ -145,7 +165,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 11px;
+  font-size: 13px;
   color: var(--pp-muted);
 }
 
@@ -154,10 +174,9 @@
 }
 
 .announcement-card__body {
-  font-size: 12px;
+  font-size: 13px;
   color: #374151;
   line-height: 1.5;
-  margin-top: 2px;
 }
 
 .announcement-card__posted-by {
@@ -167,9 +186,23 @@
   font-size: 11px;
   font-weight: 600;
   color: #22c55e;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 .announcement-card__posted-by i {
   font-size: 12px;
+}
+
+.announcement-card__photo-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 6px;
+  background: var(--pp-border);
+}
+
+.announcement-card__photo {
+  object-fit: cover;
 }

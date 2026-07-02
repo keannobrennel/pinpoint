@@ -75,7 +75,7 @@ export default function ReportCard({ report, onClick, showReporter = true }) {
 
         <PhasePill phase={aiAssessment?.phase ?? "pre-disaster"} />
 
-        <div className="report-card__footer">
+        <div className="report-card__footer--stacked">
           {submittedDate && (
             <span>Submitted: {submittedDate}</span>
           )}
