@@ -23,7 +23,17 @@ export async function POST(request, { params }) {
     });
   }
 
-  await adminDb.collection("zones").doc(params.id).update({
+  const routeParams = await params;
+  const id = routeParams.id;
+
+  if (!id || typeof id !== "string") {
+    return new Response(JSON.stringify({ error: "Missing zone id" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  await adminDb.collection("zones").doc(id).update({
     disasterMode: enabled,
     disasterModeUpdatedAt: new Date().toISOString(),
     disasterModeUpdatedBy: user.uid,

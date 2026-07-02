@@ -5,7 +5,16 @@ import { verifyAuth, unauthorized } from "@/lib/auth-middleware";
 // Public: zone info + report count only.
 // Engineer/admin: zone info + full reports list.
 export async function GET(request, { params }) {
-  const doc = await adminDb.collection("zones").doc(params.id).get();
+  const routeParams = await params;
+  const id = routeParams.id;
+  if (!id || typeof id !== "string") {
+    return new Response(JSON.stringify({ error: "Missing zone id" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const doc = await adminDb.collection("zones").doc(id).get();
 
   if (!doc.exists) {
     return new Response(JSON.stringify({ error: "Zone not found" }), {
@@ -16,7 +25,7 @@ export async function GET(request, { params }) {
 
   const reportsSnap = await adminDb
     .collection("reports")
-    .where("zoneId", "==", params.id)
+    .where("zoneId", "==", id)
     .orderBy("priorityScore", "desc")
     .get();
 
@@ -51,11 +60,20 @@ export async function GET(request, { params }) {
 // Plain field updates: admin only.
 // Verdict updates (body.verdict present): engineer or admin.
 export async function PATCH(request, { params }) {
+  const routeParams = await params;
+  const id = routeParams.id;
+  if (!id || typeof id !== "string") {
+    return new Response(JSON.stringify({ error: "Missing zone id" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   const user = await verifyAuth(request);
   if (!user) return unauthorized();
 
   const body = await request.json();
-  const zoneRef = adminDb.collection("zones").doc(params.id);
+  const zoneRef = adminDb.collection("zones").doc(id);
 
   if (body.verdict) {
     if (user.role !== "engineer" && user.role !== "admin") {
