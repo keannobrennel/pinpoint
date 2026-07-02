@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { verdictToTier } from '@/components/map/Heatmap';
 
 const STATUS_LABEL = {
@@ -45,6 +46,7 @@ export default function NearbyAlertsPage({
   onViewMore,
   onGoTo,
 }) {
+  const router = useRouter();
   const infoRef = useRef(null);
   const [iconFontSize, setIconFontSize] = useState(ICON_MIN_PX);
 
@@ -102,7 +104,11 @@ export default function NearbyAlertsPage({
           </span>
           Nearby Alerts
         </p>
-        <button type="button" className="nearby-alerts-page__see-all">
+        <button
+          type="button"
+          className="nearby-alerts-page__see-all"
+          onClick={() => router.push('/community')}
+        >
           See all <i className="fa-solid fa-chevron-right" style={{ fontSize: 11 }}></i>
         </button>
       </div>
@@ -121,45 +127,30 @@ export default function NearbyAlertsPage({
             aria-label="Previous alert"
             disabled={!canStep}
           >
-            ‹
+            <i className="fa-solid fa-chevron-left"></i>
           </button>
 
           <div className="nearby-alerts-page__content">
-            {/* Tier icon */}
-            <div className="nearby-alerts-page__icon-wrap" aria-hidden="true">
-              <i
-                className={tierConfig.iconClass}
-                style={{ color: tierConfig.color, fontSize: `${iconFontSize}px` }}
-              ></i>
-            </div>
 
             {/* Info */}
             <div className="nearby-alerts-page__info" ref={infoRef}>
-              <p className="nearby-alerts-page__place" title={current.placeName}>
-                {current.placeName ?? 'Unnamed location'}
-              </p>
-
               <div className="nearby-alerts-page__status-row">
                 <span className="nearby-alerts-page__status">{statusText}</span>
               </div>
 
-              {current.postedBy && (
+              <p className="nearby-alerts-page__place" title={current.placeName}>
+                {current.placeName ?? 'Unnamed location'}
+              </p>
+
+              {/* {current.postedBy && (
                 <p className="nearby-alerts-page__posted-by">
                   <i className="fa-solid fa-circle-check"></i>
                   {current.postedBy}
                 </p>
-              )}
+              )} */}
 
               {metaText && <p className="nearby-alerts-page__meta">{metaText}</p>}
 
-              {/*
-                Action row — "Go to" flies the map to this exact alert's
-                location without changing the carousel index or opening the
-                dialog (that's what View More is for). Same width as View
-                More via the shared .nearby-alerts-page__actions flex row
-                (flex: 1 on both buttons) rather than a fixed pixel width,
-                so they stay evenly matched at any card size.
-              */}
               <div className="nearby-alerts-page__actions">
                 <button
                   type="button"
@@ -188,7 +179,7 @@ export default function NearbyAlertsPage({
             aria-label="Next alert"
             disabled={!canStep}
           >
-            ›
+            <i className="fa-solid fa-chevron-right"></i>
           </button>
         </div>
       )}

@@ -3,11 +3,6 @@
 */
 
 .pinpoint-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -45,15 +40,31 @@
   margin-top: -3px;
 }
 
+.header-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 41px;
+  height: 41px;
+  border-radius: 50%;
+  background: var(--pp-border);
+  color: var(--pp-navy);
+  flex-shrink: 0;
+}
+
+.header-icon-btn i {
+  font-size: 18px;
+}
+
 .header-avatar {
-  width: 47px;
-  height: 47px;
+  width: 41px;
+  height: 41px;
   border-radius: 50%;
   border: none;
   padding: 0;
   cursor: pointer;
   overflow: hidden;
-  background: var(--pp-muted);
+  background: var(--pp-navy);
   flex-shrink: 0;
 }
 
@@ -71,6 +82,6 @@
   height: 100%;
   font-size: 17px;
   font-weight: 600;
-  color: var(--pp-navy);
-  background: var(--pp-muted);
+  color: var(--pp-white);
+  background: var(--pp-navy);
 }

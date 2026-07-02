@@ -1,21 +1,6 @@
 "use client";
 
 // components/community/AnnouncementCard.jsx
-import { useState } from "react";
-import Image from "next/image";
-
-/**
- * AnnouncementCard
- *
- * Props:
- * - type: string        e.g. "INSPECTION IN PROGRESS"
- * - title: string       e.g. "Mabini Elementary School"
- * - location: string    e.g. "San Jose del Monte, Bulacan"
- * - body: string        announcement text
- * - postedBy: string    e.g. "San Jose Engineering Office"
- * - postedAt: string    e.g. "1min ago"
- * - photoUrl?: string   optional. If present, a photo is shown below the text.
- */
 export default function AnnouncementCard({
   type,
   title,
@@ -25,8 +10,6 @@ export default function AnnouncementCard({
   postedAt,
   photoUrl,
 }) {
-  const [imgError, setImgError] = useState(false);
-  const showPhoto = photoUrl && !imgError;
 
   return (
     <div className="announcement-card">
@@ -45,19 +28,6 @@ export default function AnnouncementCard({
         <i className="fa-solid fa-circle-check" aria-hidden="true" />
         Posted by {postedBy}
       </p>
-
-      {showPhoto && (
-        <div className="announcement-card__photo-wrap">
-          <Image
-            src={photoUrl}
-            alt={title}
-            fill
-            className="announcement-card__photo"
-            sizes="(max-width: 600px) 100vw, 600px"
-            onError={() => setImgError(true)}
-          />
-        </div>
-      )}
     </div>
   );
 }

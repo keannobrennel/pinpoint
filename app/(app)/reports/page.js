@@ -13,8 +13,11 @@ const TABS = [
   { key: "post", label: "Post-disaster" },
 ];
 
-// Maps tab keys to the aiAssessment.mode value written by the report
-// submission flow (app/(app)/report/page.js).
+// Maps tab keys to the "mode" value written by the report submission flow
+// (app/(app)/report/page.js). Reports carry this both as a top-level
+// `mode` field and duplicated at `aiAssessment.mode`; filtering checks the
+// top-level field first and falls back to aiAssessment.mode for any
+// report missing it.
 const TAB_TO_MODE = {
   pre: "pre_disaster",
   post: "post_disaster",
@@ -33,7 +36,8 @@ export default function ReportsPage() {
     activeTab === "all"
       ? reports
       : reports.filter(
-          (report) => report.aiAssessment?.mode === TAB_TO_MODE[activeTab],
+          (report) =>
+            (report.mode ?? report.aiAssessment?.mode) === TAB_TO_MODE[activeTab],
         );
 
   return (
@@ -42,8 +46,7 @@ export default function ReportsPage() {
       subtitle="Review reports submitted by the residents."
       tabs={TABS}
       defaultTab="all"
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
+      onFilterChange={setActiveTab}
     >
       {loading ? (
         <p className="reports-list-status">Loading reports...</p>

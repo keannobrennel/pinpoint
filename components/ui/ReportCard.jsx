@@ -15,19 +15,23 @@ export default function ReportCard({ report, onClick, showReporter = true }) {
   const {
     imageUrl,
     aiAssessment,
-    location,
+    city,
+    barangay,
     status,
     reportedAt,
     verifiedByName,
+    mode,
   } = report;
 
   const title = aiAssessment?.affectedStructureType
     ? `${aiAssessment.damageClassification?.replace(/_/g, " ")} — ${aiAssessment.affectedStructureType}`
     : "Hazard Report";
 
-  const locationLabel = [location?.barangay, location?.city]
-    .filter(Boolean)
-    .join(", ");
+  // city/barangay are top-level fields on the report doc (see
+  // lib/schemas.js) — not nested under location, which only holds
+  // { lat, lng }. Previously read as location?.barangay/location?.city,
+  // which was always undefined.
+  const locationLabel = [barangay, city].filter(Boolean).join(", ");
 
   const submittedDate = reportedAt
     ? new Date(reportedAt).toLocaleDateString("en-PH", {
@@ -73,14 +77,22 @@ export default function ReportCard({ report, onClick, showReporter = true }) {
           </p>
         )}
 
-        <PhasePill phase={aiAssessment?.phase ?? "pre-disaster"} />
+        <PhasePill phase={(mode ?? aiAssessment?.mode ?? "pre_disaster").replace(/_/g, "-")} />
 
         <div className="report-card__footer--stacked">
           {submittedDate && (
             <span>Submitted: {submittedDate}</span>
           )}
+          {/* NOTE: this was showing verifiedByName under the label
+              "Reporter", which is misleading — verifiedByName is the
+              staff member who verified the report, not the citizen who
+              submitted it. Relabeled to be accurate. If you want the
+              actual submitter's name shown here instead, that requires
+              resolving report.submittedBy (a uid) via a users/{uid}
+              lookup, same as hooks/useReport.js now does for the detail
+              page — happy to wire that in for the list too. */}
           {showReporter && verifiedByName && (
-            <span>Reporter: {verifiedByName}</span>
+            <span>Verified by: {verifiedByName}</span>
           )}
         </div>
       </div>

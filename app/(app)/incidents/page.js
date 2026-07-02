@@ -1,49 +1,38 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthGuard } from "@/lib/use-auth-guard";
+import { useIncidents } from "@/hooks/useIncidents";
 import ListScreenShell from "@/components/ui/ListScreenShell";
 import IncidentCard from "@/components/incidents/IncidentCard";
 
 const TABS = [
-  { key: "all",  label: "All" },
-  { key: "pre",  label: "Pre-disaster" },
+  { key: "all", label: "All" },
+  { key: "pre", label: "Pre-disaster" },
   { key: "post", label: "Post-disaster" },
 ];
 
-// Placeholder incidents — replace with Firestore data when ready.
-const MOCK_INCIDENTS = [
-  {
-    id: "1",
-    imageUrl: null,
-    name: "Cracked Walls in San Jose",
-    center: { lat: 14.8137, lng: 121.0474 },
-    reportCount: 18,
-    officialVerdict: "verified",
-    verdictPostedAt: "2026-06-29T10:00:00.000Z",
-    verdictPostedBy: "Responder 01",
-    updatedAt: "2026-06-29T10:02:00.000Z",
-    disasterMode: true, // post-disaster -> Form B
-  },
-  {
-    id: "2",
-    imageUrl: null,
-    name: "Leaning Perimeter Wall in Norzagaray",
-    center: { lat: 14.9112, lng: 121.0186 },
-    reportCount: 6,
-    officialVerdict: "pending",
-    verdictPostedAt: "2026-06-30T09:00:00.000Z",
-    verdictPostedBy: "Responder 02",
-    updatedAt: "2026-06-30T09:05:00.000Z",
-    disasterMode: false, // pre-disaster -> Form A
-  },
-];
+// Incident.mode carries the same raw values as Report.mode — see
+// reports/page.js for the identical mapping.
+const TAB_TO_MODE = {
+  pre: "pre_disaster",
+  post: "post_disaster",
+};
 
 export default function IncidentsPage() {
   const { status } = useAuthGuard(["engineer"]);
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState("all");
+
+  const { incidents, loading } = useIncidents();
 
   if (status !== "ready") return null;
+
+  const filteredIncidents =
+    activeTab === "all"
+      ? incidents
+      : incidents.filter((incident) => incident.mode === TAB_TO_MODE[activeTab]);
 
   return (
     <ListScreenShell
@@ -51,14 +40,21 @@ export default function IncidentsPage() {
       subtitle="Clustered and verified reports requiring engineer assessment."
       tabs={TABS}
       defaultTab="all"
+      onFilterChange={setActiveTab}
     >
-      {MOCK_INCIDENTS.map((incident) => (
-        <IncidentCard
-          key={incident.id}
-          incident={incident}
-          onClick={() => router.push(`/incidents/${incident.id}`)}
-        />
-      ))}
+      {loading ? (
+        <p className="reports-list-status">Loading incidents...</p>
+      ) : filteredIncidents.length === 0 ? (
+        <p className="reports-list-status">No incidents to show.</p>
+      ) : (
+        filteredIncidents.map((incident) => (
+          <IncidentCard
+            key={incident.id}
+            incident={incident}
+            onClick={() => router.push(`/incidents/${incident.id}`)}
+          />
+        ))
+      )}
     </ListScreenShell>
   );
 }

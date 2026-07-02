@@ -3,12 +3,16 @@
 // Used in: Incidents list (engineer only).
 //
 // Props:
-//   incident  — Zone/Incident object from Firestore
+//   incident  — Incident object from Firestore (see lib/schemas.js)
 //   onClick   — called when card is tapped
 
-import Image from "next/image";
 import StatusBadge from "@/components/ui/StatusBadge";
 import PhasePill from "@/components/ui/PhasePill";
+import {
+  formatIncidentTitle,
+  formatIncidentLocation,
+  formatIncidentPhase,
+} from "@/lib/incident-format";
 
 function timeAgo(isoString) {
   if (!isoString) return null;
@@ -22,38 +26,28 @@ function timeAgo(isoString) {
 
 export default function IncidentCard({ incident, onClick }) {
   const {
-    imageUrl,
-    name,
-    center,
     reportCount,
-    officialVerdict,
-    verdictPostedAt,
-    verdictPostedBy,
+    reportIds,
+    status,
     updatedAt,
-    disasterMode,
+    engineerAssessment,
   } = incident;
 
-  const phase = disasterMode ? "post-disaster" : "pre-disaster";
-  const status = officialVerdict ?? "pending";
+  const title = formatIncidentTitle(incident);
+  const locationLabel = formatIncidentLocation(incident);
+  const phase = formatIncidentPhase(incident);
+  const count = reportCount ?? reportIds?.length ?? 0;
   const latest = timeAgo(updatedAt);
 
   return (
     <button type="button" className="report-card" onClick={onClick}>
-      {/* Thumbnail — incidents use a representative image or placeholder */}
+      {/* Incidents have no single representative photo — they cluster
+          N reports, each with their own imageUrl — so this is always a
+          placeholder rather than trying to pick one report's photo. */}
       <div className="report-card__img-wrap">
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt="Incident photo"
-            fill
-            className="report-card__img"
-            sizes="96px"
-          />
-        ) : (
-          <div className="report-card__img-placeholder">
-            <i className="fa-solid fa-image" />
-          </div>
-        )}
+        <div className="report-card__img-placeholder">
+          <i className="fa-solid fa-layer-group" />
+        </div>
       </div>
 
       {/* Content */}
@@ -63,41 +57,44 @@ export default function IncidentCard({ incident, onClick }) {
           <i className="fa-solid fa-arrow-right report-card__arrow" aria-hidden="true" />
         </div>
 
-        <p className="report-card__title">{name}</p>
+        <p className="report-card__title">{title}</p>
 
-        {center && (
+        {locationLabel && (
           <p className="report-card__location">
             <i className="fa-solid fa-location-dot" aria-hidden="true" />
-            {/* Replace with reverse-geocoded label when available */}
-            {center.lat.toFixed(4)}, {center.lng.toFixed(4)}
+            {locationLabel}
           </p>
         )}
 
         <PhasePill phase={phase} />
 
         <div className="report-card__footer">
-          {reportCount != null && (
-            <span className="report-card__count">
-              <i className="fa-solid fa-user-group" aria-hidden="true" />
-              {reportCount} reports
-            </span>
-          )}
+          <span className="report-card__count">
+            <i className="fa-solid fa-user-group" aria-hidden="true" />
+            {count} {count === 1 ? "report" : "reports"}
+          </span>
           {latest && <span>· Latest {latest}</span>}
         </div>
 
-        {verdictPostedAt && (
+        {/* Only shown once an engineer has actually assessed the
+            incident — engineerAssessment is null until then (see
+            lib/schemas.js), unlike the old mock which always showed a
+            "Verified on" line. */}
+        {engineerAssessment?.assessedAt && (
           <div className="report-card__footer--stacked">
             <span>
-              Verified on:{" "}
-              {new Date(verdictPostedAt).toLocaleDateString("en-PH", {
+              Assessed on:{" "}
+              {new Date(engineerAssessment.assessedAt).toLocaleDateString("en-PH", {
                 month: "long", day: "numeric", year: "numeric",
               })}{" "}
               |{" "}
-              {new Date(verdictPostedAt).toLocaleTimeString("en-PH", {
+              {new Date(engineerAssessment.assessedAt).toLocaleTimeString("en-PH", {
                 hour: "numeric", minute: "2-digit",
               })}
             </span>
-            {verdictPostedBy && <span>Verified by: {verdictPostedBy}</span>}
+            {engineerAssessment.assessedBy && (
+              <span>Assessed by: {engineerAssessment.assessedBy}</span>
+            )}
           </div>
         )}
       </div>
